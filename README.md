@@ -19,3 +19,14 @@ The application will use it's own API in order to communicate with the database.
 - Create requirements list...
 
 ## Other headings...
+
+
+## Team Members
+
+| Name             | Email Address              |
+|------------------|----------------------------|
+| Daelin Campleman | daelin.campleman@bbd.co.za |
+| Johan Smit       | johansm@bbd.co.za          |
+| Reece Stephenson | reeces@bbd.co.za           |
+| Matthew Dacre    | matthewd@bbd.co.za         |
+| Thomas Stevens   | thomas@bbd.co.za           |
