@@ -2,6 +2,11 @@
 
 Feel free to add to this or change whatever, this is just what I had in my head when I came up with this idea 😋
 
+| Links |
+|-|
+| [GitHub Repo](https://github.com/Daelin-Campleman/Quiz-Game/) |
+| [Trello Board](https://trello.com/invite/b/oyYSQltB/ATTIb28d46f87b502d79c5f2c283e844894d51B711F6/quiz-game) |
+
 ## Overview
 
 This website will allow users to take quizes with their friends (kinda like running your own quiz night). General knowledge multiple choice questions will be shows to all users who have joined a specific quiz. Participants will receive points for correct answers and a leaderboard will show who is doing best.
