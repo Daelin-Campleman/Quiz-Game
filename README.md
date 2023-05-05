@@ -12,7 +12,7 @@ A database will be used to store all the questions that are asked in a quiz so t
 
 The application will use it's own API in order to communicate with the database.
 
-[Express](https://expressjs.com/) and [Socket.io](https://socket.io/) will be used to serve the webpage and manage communication between plays and the server.
+[Express](https://expressjs.com/) and [Socket.io](https://socket.io/) will be used to serve the webpage and manage communication between players and the server.
 
 ## Requirements
 
