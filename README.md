@@ -5,7 +5,7 @@ Feel free to add to this or change whatever, this is just what I had in my head 
 | Links |
 |-|
 | [GitHub Repo](https://github.com/Daelin-Campleman/Quiz-Game/) |
-| [Trello Board](https://trello.com/invite/b/oyYSQltB/ATTIb28d46f87b502d79c5f2c283e844894d51B711F6/quiz-game) |
+| [Trello Board](https://trello.com/b/oyYSQltB/quiz-game) ([Invite](https://trello.com/invite/b/oyYSQltB/ATTIb28d46f87b502d79c5f2c283e844894d51B711F6/quiz-game)) |
 
 ## Overview
 
