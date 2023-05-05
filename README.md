@@ -1,5 +1,7 @@
 # Quiz Game
 
+Feel free to add to this or change whatever, this is just what I had in my head when I came up with this idea 😋
+
 ## Overview
 
 This website will allow users to take quizes with their friends (kinda like running your own quiz night). General knowledge multiple choice questions will be shows to all users who have joined a specific quiz. Participants will receive points for correct answers and a leaderboard will show who is doing best.
