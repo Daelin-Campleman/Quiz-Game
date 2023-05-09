@@ -20,7 +20,9 @@ function parseMessage(msg, ws) {
         started: false,
         questions: getQuestions()
       });
-      ws.send(`gameID: ${gameID}`);
+      ws.send(JSON.stringify({
+        gameID: gameID
+      }));
       console.log(liveGames);
       break;
     default:
