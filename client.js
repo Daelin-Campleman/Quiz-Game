@@ -1,8 +1,7 @@
 const socket = new WebSocket("ws://localhost:8080")
 let gameID = "";
 socket.onmessage = (event) => {
-    gameID = JSON.parse(event.data)['gameID'];
-    console.log(`Registered to game ${gameID}`);
+    console.log(`Message received: ${event.data}`)
 };
 
 function createGame() {
@@ -13,4 +12,9 @@ function createGame() {
 }
 
 function joinGame() {
+    let gameID = document.getElementById("inputbox").value;
+    socket.send(JSON.stringify({
+        gameID: gameID,
+        requestType: "JOIN"
+    }));
 }
