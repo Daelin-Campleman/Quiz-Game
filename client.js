@@ -1,14 +1,9 @@
-function createConnection() {
+function createGame() {
     const socket = new WebSocket("ws://localhost:8080");
 
-    socket.onopen = function(e) {
-        console.log("[open] Connection established");
-        console.log("Sending to server");
-        socket.send("My name is John");
-    };
+    socket.addEventListener("open", (event) => {
+        socket.send("CREATE");
+    });
 
-    socket.onmessage = function(event) {
-        console.log(`[message] Data received from server: ${event.data}`);
-    };
+    socket.addEventListener("message", (msg) => console.log(msg.data));
 }
-
