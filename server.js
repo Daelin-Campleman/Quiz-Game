@@ -1,29 +1,55 @@
 import { getQuestions } from "./questions.js";
 import { WebSocketServer } from "ws"; 
+import { v4 as uuidv4 } from "uuid";
 
 const wss = new WebSocketServer({ port: 8080 });
 
+// Games should probably be stored using some kind of hash map so we can perform O(1) checks to see if code already exists.
+// Currently ignoring the problem by using a long code
+// Maybe use a UUID as the key? 
 const liveGames = [];
 
+function createGame(msg, ws) {
+  const getRandomCode = () => Math.random().toString(36).slice(2, 25).toUpperCase();
+  let gameID = getRandomCode();
+  let gameObject = {
+    playerProfile: {
+      socket: ws,
+      uuid: uuidv4(),
+      score: 0,
+      answered: false
+    },
+    gameID: gameID,
+    numberOfQuestions: msg['numberOfQuestions'],
+    currentQuestion: 0,
+    numAnswers: 0,
+    started: false,
+    questions: getQuestions()
+  };
+
+  liveGames.push(gameObject);
+  ws.send(JSON.stringify({
+    // This can be done better with spreading, not sure how though
+    gameID: gameObject.gameID,
+    playerID: gameObject.playerProfile.uuid
+  }));
+  return gameID;
+}
+
+function broadcast() {
+  liveGames.map( (value, index) => {
+    value.playerProfile.socket.send("Message");
+  });
+}
+
 function parseMessage(msg, ws) {
-  const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-  console.log(`Received Message: ${JSON.stringify(msg)}`);
   switch(msg['requestType']) {
     case "CREATE":
-      let gameID = getRandomCode();
-      liveGames.push({
-        playerProfile: {},
-        gameID: gameID,
-        numberOfQuestions: msg['numberOfQuestions'],
-        currentQuestion: 0,
-        numAnswers: 0,
-        started: false,
-        questions: getQuestions()
-      });
-      ws.send(JSON.stringify({
-        gameID: gameID
-      }));
-      console.log(liveGames);
+      let gameID = createGame(msg, ws);
+      console.log(`Created new game with code: ${gameID}`);
+      break;
+    case "BROADCAST":
+      broadcast();
       break;
     default:
       return;
