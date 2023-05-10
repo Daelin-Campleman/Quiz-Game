@@ -2,7 +2,17 @@ import { getQuestions } from "./questions.js";
 import { WebSocketServer } from "ws"; 
 import { v4 as uuidv4 } from "uuid";
 
-const wss = new WebSocketServer({ port: 8080 });
+// import express
+import express from "express";
+const app = express();
+
+const server = app.listen(8080, () => {
+  console.log("Listening on port 80");
+});
+
+app.use(express.static("public"));
+
+const wss = new WebSocketServer({ server: server });
 
 wss.getUniqueID = function () {
   // https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
