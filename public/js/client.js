@@ -1,4 +1,4 @@
-const wsURL = `ws://${window.location.host}/`;
+const wsURL = `wss://${window.location.host}/`;
 const socket = new WebSocket(wsURL)
 let gameID = "";
 let playerID = "";
