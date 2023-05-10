@@ -1,4 +1,5 @@
-const socket = new WebSocket("ws://localhost:8080")
+const wsURL = `ws://${window.location.host}/`;
+const socket = new WebSocket(wsURL)
 let gameID = "";
 let playerID = "";
 socket.onmessage = (event) => {

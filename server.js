@@ -6,8 +6,10 @@ import { v4 as uuidv4 } from "uuid";
 import express from "express";
 const app = express();
 
-const server = app.listen(8080, () => {
-  console.log("Listening on port 80");
+const port = process.env.PORT || 8080;
+
+const server = app.listen(port, () => {
+  console.log(`Listening on port ${port}`);
 });
 
 app.use(express.static("public"));
