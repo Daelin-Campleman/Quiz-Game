@@ -18,6 +18,8 @@
 # For more samples to get started with GitHub Action workflows to deploy to Azure: https://github.com/Azure/actions-workflow-samples
 
 on:
+  pull_request:
+    branches: [ "qa" ]
   push:
     branches: [ "qa" ]
   workflow_dispatch:
