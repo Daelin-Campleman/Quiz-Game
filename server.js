@@ -38,16 +38,17 @@ function createGame(startingPlayer, gameOptions) {
 
 function joinGame(socket, gameID) {
   const game = liveGames.get(gameID);
-  if (game == undefined) {
+  if (game === undefined) {
     socket.send("Game does not exist."); // should probably be a JSON object but works for now
   } else if (game.started) {
     socket.send("Game has already started.");
   } else {
     const player = game.players.find(p => p.ws.id === socket.id)
-    if (player != undefined) {
+    if (player !== undefined) {
       socket.send("Player already in game"); 
     } else {
       game.players.push(new Player(socket, 0, ""));
+      console.log(liveGames);
     }
   }
 }
@@ -107,12 +108,6 @@ wss.on("connection", (ws) => {
   ws.on("message", (msg) => parseMessage(JSON.parse(msg), ws));
 });
 
-/**
- * {
- *    RequestType: "JOIN", "CREATE", "ANSWER"
- * }
- */
-
 /*
 
   game = {
@@ -128,42 +123,4 @@ wss.on("connection", (ws) => {
     uuid,
     score
   }
-
-  ------------------------
-
-  RequestType: CREATE:
-  {
-    "requestType": "CREATE",
-    "numQuestions": number,
-    "roundTime": number,
-    "questionCategories": [string]
-    "maxPlayers": number (optional)
-  }
-  Response:
-  {
-    "gameID": gameID
-  }
-
-  ------------------------
-
-  RequestType: JOIN
-  {
-    "gameID": gameID
-  }
-  Response:
-  {
-    "success": bool
-    "message": string (can be used to let FE know maxPlayers has been reached)
-  }
-
-  ------------------------
-  
-  RequestType: ANSWER
-  {
-    "gameID": gameID
-    "answer": string
-  }
-  Response:
-  No immediate response. This will be handled at the end of the round
-
 */
