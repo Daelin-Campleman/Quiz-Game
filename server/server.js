@@ -2,10 +2,10 @@ import { WebSocketServer } from "ws";
 import { createGame, joinGame, startGame, clientAnswer } from "./game.js";
 
 // import express
-import express from "express";
+import express, { response } from "express";
 const app = express();
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8090;
 
 const server = app.listen(port, () => {
   console.log(`Listening on port ${port}`);
@@ -41,7 +41,7 @@ function parseMessage(msg, ws) {
       joinGame(ws, msg['gameID']);
       break;
     case "ANSWER":
-      clientAnswer(ws, msg['gameID', msg['answer']]);
+      clientAnswer(ws, msg['gameID'], msg['answer']);
       break;
     case "START":
       startGame(msg['gameID']);

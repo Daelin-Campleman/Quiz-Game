@@ -1,10 +1,14 @@
 
-import { getQuestions } from "./questions.js";
+import { getQuestions, getAPIQuestions } from "./questions.js";
+
+// let questionsList = await getAPIQuestions();
+let questionsList = getQuestions()
 
 function Player(ws, score, currentAnswer) {
   this.ws = ws;
   this.score = score;
   this.currentAnswer = currentAnswer;
+  this.answerHistory = []
 }
 
 // Stores current games in memory
@@ -23,7 +27,8 @@ export function createGame(startingPlayer, gameOptions) {
   let gameID = getRandomCode();
   let game = {
     players: [new Player(startingPlayer, 0, "")],
-    numberOfQuestions: gameOptions['numberOfQuestions'],
+    // numberOfQuestions: gameOptions['numberOfQuestions'],
+    numberOfQuestions: 2,
     currentQuestion: 0,
     started: false,
     questions: getQuestions(),
@@ -45,13 +50,15 @@ export function createGame(startingPlayer, gameOptions) {
  * *
  * Receives answer for player and stores in player object in game object in liveGames
  */
-export function clientAnswer(clientID, gameID, answer) {
+export function clientAnswer(client, gameID, answer) {
   const game = liveGames.get(gameID);
-  const player = game.players.find(p => p.ws.id === clientID)
+  const player = game.players.find(p => p.ws.id === client.id)
   if (player != undefined) {
     player.currentAnswer = answer;
   }
-  socket.send("Received answer"); 
+  client.send(JSON.stringify({
+    "message": "Answer received"
+  })); 
 }
 
 /**
@@ -89,8 +96,17 @@ export function joinGame(socket, gameID) {
  * *
  * Sends a question to a websocket connection
  */
-function sendQuestion(question, socket) {
-  socket.send(JSON.stringify(question));
+function sendQuestions(question, gameID) {
+  const game = liveGames.get(gameID);
+  if (game != undefined) {
+    const players = game.players;
+    players.forEach(p => {
+      p.ws.send(JSON.stringify({
+        "text": question.question,
+        "options": [...question.incorrectAnswers, question.correctAnswer]
+      }));
+    })
+  }
 }
 
 /**
@@ -103,38 +119,42 @@ function sendQuestion(question, socket) {
  */
 export function startGame(gameID) {
   const game = liveGames.get(gameID);
-  game.players.forEach(p => {
-    sendQuestion(game.questions[0], p.ws);
-  });
-  game.currentQuestion += 1;
-
+  sendQuestions(questionsList[game.currentQuestion], gameID);
   game.intervalID = setInterval(() => {
-    roundOver(game);
-  }, 1000)
+    roundOver(gameID);
+  }, 5000)
   
 }
 
-/**
- * 
- * @param {Object} game 
- * 
- * *
- * Collates score, sends new question and ends game when over
- * TODO: This does not work
- */
-export function roundOver(game) {
-  // Need to clear setIntervale once game is over
+export function roundOver(gameID) {
+  const game = liveGames.get(gameID);
+  const players = game.players;
+  let correctAnswer = game.questions[game.currentQuestion].correctAnswer.trim().toUpperCase();
+  game.currentQuestion++;
+  players.forEach(p => {
+    if (p.currentAnswer.trim().toUpperCase() === correctAnswer) {
+      p.score++;
+      p.answerHistory.push(true);
+    } else {
+      p.answerHistory.push(false);
+    }
+  });
+  
+  if (game.currentQuestion >= game.numberOfQuestions) {
+    endGame(gameID);
+  } else {
+    sendQuestions(questionsList[game.currentQuestion], gameID);
+  }
+}
+
+function endGame(gameID) {
+  const game = liveGames.get(gameID);
+  clearInterval(game.intervalID);
+  console.log(`Game ended: ${gameID}`)
   const players = game.players;
   players.forEach(p => {
-    let result = "incorrect";
-    if (p.currentAnswer === game.questions[game.currentQuestion.correctAnswer]) {
-      result = "correct";
-      p.score++;
-    }
     p.ws.send(JSON.stringify({
-      result: result,
-      score: p.score
-    }));
+      "score": p.score
+    }))
   });
-  // Need to send next question here
 }

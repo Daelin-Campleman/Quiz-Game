@@ -1,9 +1,13 @@
 const wsURL = window.location.host.includes("localhost") ? `ws://${window.location.host}/` : `wss://${window.location.host}/`;
-const socket = new WebSocket("ws://localhost:8080");
+const socket = new WebSocket("ws://localhost:8090");
 let gameID = "";
 let playerID = "";
 socket.onmessage = (event) => {
     console.log(`Message received: ${event.data}`)
+    let response = JSON.parse(event.data);
+    if (response['gameID'] != undefined) {
+        gameID = response['gameID']
+    }
 };
 
 function createGame() {
@@ -18,6 +22,7 @@ function createGame() {
  * Can be used to send new questions etc.
  */
 function startGame() {
+    console.log(`gameID: ${gameID}`)
     socket.send(
         JSON.stringify({
             requestType: "START",
@@ -31,5 +36,14 @@ function joinGame() {
     socket.send(JSON.stringify({
         gameID: gameID,
         requestType: "JOIN"
+    }));
+}
+
+function sendAnswer() {
+    answer = document.getElementById("answerbox").value;
+    socket.send(JSON.stringify({
+        answer: answer,
+        requestType: "ANSWER",
+        gameID: gameID
     }));
 }
