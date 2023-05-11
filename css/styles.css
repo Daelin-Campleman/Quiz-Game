@@ -1,0 +1,21 @@
+main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10vh;
+    margin-bottom: 10vh;
+    width: 40vh;
+}
+
+button {
+    width: 200px;
+    height: 50px;
+    margin: 10px;
+}
+
