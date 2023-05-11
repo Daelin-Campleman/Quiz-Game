@@ -27,15 +27,18 @@ export function createGame(startingPlayer, gameOptions) {
   let gameID = getRandomCode();
   let game = {
     players: [new Player(startingPlayer, 0, "")],
-    // numberOfQuestions: gameOptions['numberOfQuestions'],
-    numberOfQuestions: 2,
-    currentQuestion: 0,
+    // questionsPerRound: gameOptions['numberOfQuestionsPerRound'],
+    questionsPerRound: 2,
+    // numberofRounds: gameOptions['numberOfRounds'],
+    numberOfRounds: 3,
+    currentRound: 1,
+    currentQuestion: 1,
     started: false,
     questions: getQuestions(),
     intervalID: 0
   };
   liveGames.set(gameID, game);
-  // We might want to send PlayerID here for further communucation
+  // We might want to send PlayerID here for further communication
   startingPlayer.send(JSON.stringify({
     gameID: gameID
   }));
@@ -91,10 +94,10 @@ export function joinGame(socket, gameID) {
 /**
  * 
  * @param {Object} question 
- * @param {Websocket} socket 
+ * @param {string} gameID 
  * 
  * *
- * Sends a question to a websocket connection
+ * Sends a question to a all clients in game
  */
 function sendQuestions(question, gameID) {
   const game = liveGames.get(gameID);
@@ -103,7 +106,7 @@ function sendQuestions(question, gameID) {
     players.forEach(p => {
       p.ws.send(JSON.stringify({
         "text": question.question,
-        "options": [...question.incorrectAnswers, question.correctAnswer]
+        "options": [...question.incorrectAnswers, question.correctAnswer] //TODO: shuffle
       }));
     })
   }
@@ -115,21 +118,21 @@ function sendQuestions(question, gameID) {
  * 
  * *
  * Starts gameloop
- * TODO: This currently does not work 
  */
 export function startGame(gameID) {
   const game = liveGames.get(gameID);
-  sendQuestions(questionsList[game.currentQuestion], gameID);
+  sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
   game.intervalID = setInterval(() => {
-    roundOver(gameID);
-  }, 5000)
-  
+    questionOver(gameID);
+  }, 2000);
 }
 
-export function roundOver(gameID) {
+//Triggers every question interval
+export function questionOver(gameID) {
   const game = liveGames.get(gameID);
+  console.log(`round: ${game.currentRound}, question: ${game.currentQuestion}`)
   const players = game.players;
-  let correctAnswer = game.questions[game.currentQuestion].correctAnswer.trim().toUpperCase();
+  let correctAnswer = game.questions[calculateQuestionNumber(gameID)].correctAnswer.trim().toUpperCase();
   game.currentQuestion++;
   players.forEach(p => {
     if (p.currentAnswer.trim().toUpperCase() === correctAnswer) {
@@ -140,10 +143,29 @@ export function roundOver(gameID) {
     }
   });
   
-  if (game.currentQuestion >= game.numberOfQuestions) {
+  if (game.currentQuestion > game.questionsPerRound) {
+    roundOver(gameID);
+  } else {
+    sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+  }
+}
+
+function roundOver(gameID) {
+  //TODO: maybe send something saying that the round is over?
+  const game = liveGames.get(gameID);
+  clearInterval(game.intervalID);
+  game.currentQuestion = 1;
+  game.currentRound++;
+  if (game.currentRound > game.numberOfRounds) {
     endGame(gameID);
   } else {
-    sendQuestions(questionsList[game.currentQuestion], gameID);
+    //Delay each round by 5s
+    setTimeout(() => {
+      sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+      game.intervalID = setInterval(() => {
+        questionOver(gameID);
+      }, 5000);
+    }, 5000);
   }
 }
 
@@ -154,7 +176,15 @@ function endGame(gameID) {
   const players = game.players;
   players.forEach(p => {
     p.ws.send(JSON.stringify({
+      "message": "GAME OVER",
       "score": p.score
     }))
   });
+  //TODO: DB write
+  liveGames.delete(gameID);
+}
+
+function calculateQuestionNumber(gameID) { //might be better to randomly sample list of questions and just make sure it can't repeat
+  const game = liveGames.get(gameID);
+  return (game.currentRound - 1) * game.questionsPerRound + game.currentQuestion - 1;
 }
