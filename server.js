@@ -1,16 +1,37 @@
 import { getQuestions } from "./questions.js";
 import { WebSocketServer } from "ws"; 
 import { v4 as uuidv4 } from "uuid";
+import http from "http";
+import debug from "debug";
+import { config } from "dotenv";
+import app from "./app.js";
 
-// import express
-import express from "express";
-const app = express();
+config();
 
-const server = app.listen(8080, () => {
-  console.log("Listening on port 80");
+const DEBUG = debug("dev");
+const PORT = process.env.PORT || 5000;
+
+const server = http.createServer(app);
+
+process.on("uncaughtException", (error) => {
+  DEBUG(`uncaught exception: ${error.message}`);
+  process.exit(1);
 });
 
-app.use(express.static("public"));
+process.on("unhandledRejection", (err) => {
+  DEBUG(err);
+  DEBUG("Unhandled Rejection:", {
+    name: err.name,
+    message: err.message || err,
+  });
+  process.exit(1);
+});
+
+server.listen(PORT, () => {
+  DEBUG(
+    `server running on http://localhost:${PORT} in ${process.env.NODE_ENV} mode`
+  );
+});
 
 const wss = new WebSocketServer({ server: server });
 
