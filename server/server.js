@@ -1,10 +1,10 @@
-import { getQuestions } from "./questions.js";
+import { getQuestions } from "../questions.js";
 import { WebSocketServer } from "ws"; 
 import { v4 as uuidv4 } from "uuid";
 import http from "http";
 import debug from "debug";
 import { config } from "dotenv";
-import app from "./app.js";
+import app from "../app.js";
 
 config();
 
