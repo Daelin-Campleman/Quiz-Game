@@ -5,23 +5,38 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>QuizWizzyZilla Trivia Tournament</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="container">
 
-    <script src="client.js"></script>
+    <header>
+        <img src="images/logo.jpeg" alt="logo">
+    </header>
 
-    <button onclick="createGame()">Create Game</button>
-    <button onclick="broadcast()">Broadcast</button>
+    <main>
+        <section class="bottom-third">
+            <button class="btn" id="start-btn">Start</button>
+            <br />
+            <p id="error-message"></p>
+        </section>
+    </main>
 
-
-    <form name="joinGameForm" id="myForm" action="javascript:joinGame()">
-        Enter join code: <br>
-        <input type="text" id="inputbox" name="name" value="">
-        <input type="submit">
-    </form>
-
+    <script>
+        if(window.location.host.includes("-qa")) {
+            console.log("This is QA environment");
+        }
+        
+        document.getElementById("start-btn").addEventListener("click", function() {
+            document.getElementById("error-message").textContent = "Doing fake AD stuff...";
+            document.getElementById("start-btn").disabled = true;
+            // 2 second delay
+            setTimeout(function() {
+                window.location = "/home";
+            }, 2000);
+        });
+    </script>
 </body>
 
 </html>
