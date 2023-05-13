@@ -8,22 +8,25 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import connectSqlite from "connect-sqlite3";
 import authRouter from "./routes/auth.route.js";
+import pageRouter from "./routes/page.route.js";
 import csrf from "csurf";
 
 
 config();
 const app = express();
 
+
 const SQLiteStore = connectSqlite(session);
 
 if (["development", "production"].includes(process.env.NODE_ENV)) {
-    app.use(logger("dev"));
+  app.use(logger("dev"));
 }
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(errorHandler);
+// app.use(express.static("public"));
 app.use(session({
   secret: 'the ultimate secret',
   resave: false, // don't save session if unmodified
@@ -42,6 +45,7 @@ app.use(function(req, res, next) {
 passport.initialize();
 
 app.use('/auth', authRouter);
+app.use('/app', pageRouter)
 
 app.get("/", (_, res) => {
   res.status(200).json({
@@ -51,8 +55,7 @@ app.get("/", (_, res) => {
 });
 
 app.all("*", (_, res) => {
-  throw new NotFoundError('Resource not found on this server')
+  throw new NotFoundError('Resource not found on this server, ')
 });
-
 
 export default app;

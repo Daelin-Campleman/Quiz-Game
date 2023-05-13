@@ -6,19 +6,12 @@ import debug from "debug";
 
 config();
 
-// Configure the Google strategy for use by Passport.
-//
-// OAuth 2.0-based strategies require a `verify` function which receives the
-// credential (`accessToken`) for accessing the Facebook API on the user's
-// behalf, along with the user's profile.  The function must invoke `cb`
-// with a user object, which will be set at `req.user` in route handlers after
-// authentication.
 passport.use(
   "google",
   new GoogleStrategy({
   clientID: process.env['GOOGLE_CLIENT_ID'],
   clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
-  callbackURL: '/oauth2/redirect/google',
+  callbackURL: '/auth/oauth2/redirect/google',
   scope: [ 'profile' ]
 }, function verify(issuer, profile, cb) {
   db.get('SELECT * FROM federated_credentials WHERE provider = ? AND subject = ?', [
