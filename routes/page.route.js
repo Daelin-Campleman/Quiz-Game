@@ -9,7 +9,7 @@ import { Router } from "express";
 const pageRouter = Router()
 
 pageRouter.get('/home', function(req, res, next) {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname + '/../public/index.html'));
 });
 
 export default pageRouter;

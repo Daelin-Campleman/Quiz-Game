@@ -16,7 +16,7 @@ const { protectedRoute, socialAuth } = authController;
 const authRouter = Router()
 
 authRouter.get('/login', function(req, res, next) {
-  res.sendFile(__dirname + '/login.html');
+  res.sendFile(path.join(__dirname + '/../public/login.html'));
 });
 
 authRouter.get('/login/federated/google', passport.authenticate('google'));
