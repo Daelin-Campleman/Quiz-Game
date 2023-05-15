@@ -29,6 +29,20 @@ authRouter.get('/oauth2/redirect/google', passport.authenticate('google', {
   failureRedirect: '/auth/login'
 }));
 
+authRouter.get('/user', function(req, res, next) {
+  if (req.user) {
+    res.status(200).json({
+      status: "success",
+      user: req.user,
+    });
+  } else {
+    res.status(401).json({
+      status: "unauthorized",
+      message: "You are not logged in."
+    });
+  }
+});
+
 authRouter.post('/logout', function(req, res, next) {
   req.logout(function(err) {
     if (err) { return next(err); }
