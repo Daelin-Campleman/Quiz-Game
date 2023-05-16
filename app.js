@@ -44,11 +44,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use(function(req,res,next){
-  console.log(req.user.name + " is currently logged in")
-  next();
-})
-
 passport.initialize();
 
 app.use('/auth', authRouter);
