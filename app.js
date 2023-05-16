@@ -11,6 +11,8 @@ import csrf from "csurf";
 import path from "path";
 import { fileURLToPath } from 'url';
 import { ensureLoggedIn } from "connect-ensure-login";
+import {getGameLeaderboard, getTable} from "./db/leaderboardRepository.js"
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -49,5 +51,29 @@ passport.initialize();
 app.use('/auth', authRouter);
 // app.use('/', defaultRouter);
 app.use('/', ensureLoggedIn('/auth/login/federated/google'),express.static(__dirname + '/public'));
+
+app.get("/leaderboard", async (req, res) => {
+  let gameID = req.query.gameID;
+  getGameLeaderboard(gameID).then((leaderboard) => {
+      res.send(JSON.stringify({
+        leaderboard: leaderboard
+      }))
+  }).catch((err) => {
+    res.status(400);
+    res.send(err);
+  })
+});
+
+app.get("/leaderboard/all", async (req, res) => {
+  let gameID = req.query.gameID;
+  getTable().then((table) => {
+      res.send(JSON.stringify({
+        table: table
+      }))
+  }).catch((err) => {
+    res.status(400);
+    res.send(err);
+  })
+});
 
 export default app;
