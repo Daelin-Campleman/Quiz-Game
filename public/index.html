@@ -12,7 +12,8 @@
 <body class="container">
 
     <header>
-        <img src="images/logo.jpeg" alt="logo">
+        <img src="images/logo.svg" alt="logo">
+        <h1 id="name-heading"></h1>
     </header>
 
     <main>
@@ -23,20 +24,7 @@
         </section>
     </main>
 
-    <script>
-        if(window.location.host.includes("-qa")) {
-            console.log("This is QA environment");
-        }
-        
-        document.getElementById("start-btn").addEventListener("click", function() {
-            document.getElementById("error-message").textContent = "Doing fake AD stuff...";
-            document.getElementById("start-btn").disabled = true;
-            // 2 second delay
-            setTimeout(function() {
-                window.location = "/home";
-            }, 2000);
-        });
-    </script>
+    <script src="js/index.js" type="module"></script>
 </body>
 
 </html>
