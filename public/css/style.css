@@ -162,6 +162,21 @@ section.grid {
     z-index: 1;
 }
 
+.divider {
+    width:300px;
+}
+
+.single-signin {
+    border: none;
+    background: none;
+    display: block;
+    margin: 0 auto;
+}
+
+.single-signin:hover {
+    cursor: pointer;
+}
+
 .grid>.btn {
     width: 48%;
     height: 5em;
