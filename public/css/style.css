@@ -8,34 +8,9 @@ body {
     margin: 0 auto;
 }
 
-@media screen and (min-width: 600px) {
-    .container {
-        width: 400px;
-    }
-}
-
-@media screen and (min-width: 800px) {
-    .container {
-        width: 600px;
-    }
-}
-
-@media screen and (min-width: 1000px) {
-    .container {
-        width: 800px;
-    }
-}
-
-@media screen and (min-width: 1200px) {
-    .container {
-        width: 1000px;
-    }
-}
-
-@media screen and (min-width: 1400px) {
-    .container {
-        width: 1200px;
-    }
+main {
+    text-align: center;
+    margin-top: 5em;
 }
 
 .container-fluid {
@@ -49,6 +24,48 @@ header {
 
 header img {
     width: 20%;
+}
+
+@media screen and (min-width: 600px) {
+    .container {
+        width: 400px;
+    }
+
+    header img {
+        width: 50%;
+    }
+}
+
+@media screen and (min-width: 800px) {
+    .container {
+        width: 600px;
+    }
+
+    header img {
+        width: 40%;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    .container {
+        width: 800px;
+    }
+
+    header img {
+        width: 30%;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    .container {
+        width: 1000px;
+    }
+}
+
+@media screen and (min-width: 1400px) {
+    .container {
+        width: 1200px;
+    }
 }
 
 section {

@@ -8,10 +8,12 @@ if (window.location.host.includes("-qa")) {
     console.log("This is QA environment");
 }
 
-document.getElementById("name-heading").innerHTML = "Welcome " + await fetchName()
+// document.getElementById("name-heading").innerHTML = "Welcome " + await fetchName()
 
 document.getElementById("start-btn").addEventListener("click", function (event) {
     let provider = event.currentTarget.dataset.provider;
+
+    console.log(provider);
 
     window.location = `/auth/login/federated/${provider}`;
 
