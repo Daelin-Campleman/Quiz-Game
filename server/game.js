@@ -150,6 +150,7 @@ export function questionOver(gameID) {
 
 function roundOver(gameID) {
   //TODO: maybe send something saying that the round is over?
+  //TODO: Fetch new questions for next round, otherwise questions repeat
   const game = liveGames.get(gameID);
   clearInterval(game.intervalID);
   game.currentQuestion = 1;
