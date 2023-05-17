@@ -25,15 +25,14 @@ export function createGame(startingPlayer, gameOptions) {
     let gameID = getRandomCode();
     let game = {
       players: [new Player(startingPlayer, 0, "")],
-      // questionsPerRound: gameOptions['numberOfQuestionsPerRound'],
-      questionsPerRound: 2,
-      // numberofRounds: gameOptions['numberOfRounds'],
-      numberOfRounds: 3,
+      questionsPerRound: gameOptions.questionsPerRound || 5,
+      numberOfRounds: gameOptions.numberOfRounds || 3,
       currentRound: 1,
       currentQuestion: 1,
       started: false,
       questions: quesitions,
-      intervalID: 0
+      intervalID: 0,
+      roundTime: gameOptions.roundLength || 5000
     };
     liveGames.set(gameID, game);
     // We might want to send PlayerID here for further communication

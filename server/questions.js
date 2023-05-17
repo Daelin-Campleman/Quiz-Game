@@ -7,12 +7,12 @@ import axios from "axios";
 async function getQuestions(gameOptions) {
     const URL = "https://the-trivia-api.com/v2/questions"
     const defaultOptions = {
-        limit: 5,
+        questionsPerRound: 5,
         categories: "science,film_and_tv,music,history,geography,art_and_literature,sport_and_leisure,general_knowledge,science,food_and_drink",
         difficulties: "easy,medium,hard"
     }
     let finalGameOptions = {...defaultOptions, ...gameOptions};
-    let { data } = await axios.get(URL + `?limit=${finalGameOptions.limit}&categories=${finalGameOptions.categories}&difficulties=${finalGameOptions.difficulties}`);
+    let { data } = await axios.get(URL + `?limit=${finalGameOptions.questionsPerRound}&categories=${finalGameOptions.categories}&difficulties=${finalGameOptions.difficulties}`);
     return data;
 }
 
