@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 const server = http.createServer(app);
 
 process.on("uncaughtException", (error) => {
-  DEBUG(`uncaught exception: ${error.message}`);
+  DEBUG(`uncaught exception: ${error}`);
   process.exit(1);
 });
 
@@ -29,7 +29,7 @@ process.on("unhandledRejection", (err) => {
 
 server.listen(PORT, () => {
   DEBUG(
-    `server running on http://localhost:${PORT} in ${process.env.NODE_ENV} mode`
+    `server running on http://localhost:${PORT}/auth/login in ${process.env.NODE_ENV} mode`
     );
   });
   

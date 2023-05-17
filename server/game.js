@@ -1,9 +1,6 @@
 
 import { getQuestions, getAPIQuestions } from "./questions.js";
 
-// let questionsList = await getAPIQuestions();
-let questionsList = getQuestions()
-
 function Player(ws, score, currentAnswer) {
   this.ws = ws;
   this.score = score;
@@ -24,24 +21,26 @@ const liveGames = new Map();
  */
 export function createGame(startingPlayer, gameOptions) {
   const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-  let gameID = getRandomCode();
-  let game = {
-    players: [new Player(startingPlayer, 0, "")],
-    // questionsPerRound: gameOptions['numberOfQuestionsPerRound'],
-    questionsPerRound: 2,
-    // numberofRounds: gameOptions['numberOfRounds'],
-    numberOfRounds: 3,
-    currentRound: 1,
-    currentQuestion: 1,
-    started: false,
-    questions: getQuestions(),
-    intervalID: 0
-  };
-  liveGames.set(gameID, game);
-  // We might want to send PlayerID here for further communication
-  startingPlayer.send(JSON.stringify({
-    gameID: gameID
-  }));
+  getQuestions().then((quesitions) => {
+    let gameID = getRandomCode();
+    let game = {
+      players: [new Player(startingPlayer, 0, "")],
+      // questionsPerRound: gameOptions['numberOfQuestionsPerRound'],
+      questionsPerRound: 2,
+      // numberofRounds: gameOptions['numberOfRounds'],
+      numberOfRounds: 3,
+      currentRound: 1,
+      currentQuestion: 1,
+      started: false,
+      questions: quesitions,
+      intervalID: 0
+    };
+    liveGames.set(gameID, game);
+    // We might want to send PlayerID here for further communication
+    startingPlayer.send(JSON.stringify({
+      gameID: gameID
+    }));
+  })
 }
 
 /**
@@ -121,7 +120,7 @@ function sendQuestions(question, gameID) {
  */
 export function startGame(gameID) {
   const game = liveGames.get(gameID);
-  sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+  sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
   game.intervalID = setInterval(() => {
     questionOver(gameID);
   }, 2000);
@@ -146,7 +145,7 @@ export function questionOver(gameID) {
   if (game.currentQuestion > game.questionsPerRound) {
     roundOver(gameID);
   } else {
-    sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+    sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
   }
 }
 
@@ -155,13 +154,13 @@ function roundOver(gameID) {
   const game = liveGames.get(gameID);
   clearInterval(game.intervalID);
   game.currentQuestion = 1;
-  game.currentRound++;
+  game.currentRound += 1;
   if (game.currentRound > game.numberOfRounds) {
     endGame(gameID);
   } else {
     //Delay each round by 5s
     setTimeout(() => {
-      sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+      sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
       game.intervalID = setInterval(() => {
         questionOver(gameID);
       }, 5000);
@@ -186,5 +185,5 @@ function endGame(gameID) {
 
 function calculateQuestionNumber(gameID) { //might be better to randomly sample list of questions and just make sure it can't repeat
   const game = liveGames.get(gameID);
-  return (game.currentRound - 1) * game.questionsPerRound + game.currentQuestion - 1;
+  return (game.currentQuestion - 1);
 }
