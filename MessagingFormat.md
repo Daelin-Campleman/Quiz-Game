@@ -26,8 +26,9 @@ The client can send the following message types: `JOIN, CREATE, ANSWER, START`.
         ```JSON
         {
             requestType: "CREATE",
-            numberOfQuestions: <number>,
-            // Further game options
+            limit: <number>,
+            categories: <string>,
+            difficulties: <string>
         }
     - Response:
         ```JSON

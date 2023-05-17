@@ -21,7 +21,7 @@ const liveGames = new Map();
  */
 export function createGame(startingPlayer, gameOptions) {
   const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-  getQuestions().then((quesitions) => {
+  getQuestions(gameOptions).then((quesitions) => {
     let gameID = getRandomCode();
     let game = {
       players: [new Player(startingPlayer, 0, "")],

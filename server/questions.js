@@ -5,7 +5,6 @@ import axios from "axios";
  * 
  */
 async function getQuestions(gameOptions) {
-    console.log("-------------------\nGetting Questions");
     const URL = "https://the-trivia-api.com/v2/questions"
     const defaultOptions = {
         limit: 5,
