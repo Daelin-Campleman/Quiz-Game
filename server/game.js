@@ -1,5 +1,6 @@
 
 import { getQuestions, getAPIQuestions } from "./questions.js";
+import {saveGameLeaderBoard} from "../db/leaderboardRepository.js"
 
 function Player(ws, score, currentAnswer) {
   this.ws = ws;
@@ -163,7 +164,7 @@ function roundOver(gameID) {
       sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
       game.intervalID = setInterval(() => {
         questionOver(gameID);
-      }, 5000);
+      }, 2000);
     }, 5000);
   }
 }
@@ -179,11 +180,22 @@ function endGame(gameID) {
       "score": p.score
     }))
   });
-  //TODO: DB write
+  sendToDB(gameID);
   liveGames.delete(gameID);
 }
 
 function calculateQuestionNumber(gameID) { //might be better to randomly sample list of questions and just make sure it can't repeat
   const game = liveGames.get(gameID);
-  return (game.currentQuestion - 1);
+  return (game.currentRound - 1) * game.questionsPerRound + game.currentQuestion - 1;
+}
+
+async function sendToDB(gameID) {
+  const game = liveGames.get(gameID);
+  const players = game.players;
+  let playersSql = "";
+  players.forEach(p => {
+    playersSql += `(\'${gameID}\', \'${p.ws.id}\', ${p.score}),`
+  });
+  playersSql = playersSql.slice(0, -1);
+  saveGameLeaderBoard(playersSql).catch((err) => console.log(err));
 }

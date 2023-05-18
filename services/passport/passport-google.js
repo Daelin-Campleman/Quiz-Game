@@ -1,6 +1,6 @@
 import passport from "passport";
 import GoogleStrategy from "passport-google-oidc";
-import db from "../../db/db.js";
+import {db} from "../../db/db.js";
 import { config } from "dotenv";
 import debug from "debug";
 
