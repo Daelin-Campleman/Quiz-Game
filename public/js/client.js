@@ -152,8 +152,7 @@ async function joinGame() {
     }));
 }
 
-function sendAnswer() {
-    answer = document.getElementById("answerbox").value;
+function sendAnswer(answer) {
     socket.send(JSON.stringify({
         answer: answer,
         requestType: "ANSWER",
@@ -320,6 +319,14 @@ function showGameOptions(){
 }
 
 document.getElementById("create-game").addEventListener("click", createGame);
+
+let ansBtns = document.getElementsByClassName("answer-btn");
+
+Array.from(ansBtns).forEach(btn => {
+    btn.addEventListener("click", (event) => {
+        sendAnswer(event.currentTarget.textContent);
+    });
+});
 
 
 
