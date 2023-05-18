@@ -2,6 +2,7 @@ const wsURL = window.location.host.includes("localhost") ? `ws://${window.locati
 const socket = new WebSocket(wsURL);
 
 let timer;
+let gameID = "";
 
 async function fetchName() {
     let response = await fetch("/auth/user");
@@ -37,7 +38,6 @@ socket.onopen = () => {
     }
 }
 
-let gameID = "";
 let playerID = "";
 socket.onmessage = async (event) => {
     console.log(`Message received: ${event.data}`)
@@ -87,7 +87,14 @@ socket.onmessage = async (event) => {
             li.textContent = response['players'][i]['name'];
             document.getElementById('player-list').appendChild(li);
         }
-    } else if (response['text'] != undefined){
+    } else if (response['requestType'] === "JOIN") {
+        if (response['success']) {
+            showWaitingScreen();
+        } else {
+            alert(response['message']);
+        }
+    }
+    else if (response['text'] != undefined){
         document.getElementById("join-code-header").textContent = "";
         let question = response['text']['text'];
         let answers = response['options'];
@@ -120,6 +127,7 @@ socket.onmessage = async (event) => {
 
         startTimer(questionTime);
     } else if (response['message'] == "GAME OVER"){
+        console.log(response);
         let playerDetails = response['playerDetails'];
 
         localStorage.setItem("playerDetails", playerDetails);
@@ -132,16 +140,22 @@ async function createGame() {
     let numQuestions = document.getElementById("number-of-questions").value;
     let numRounds = document.getElementById("number-of-rounds").value;
     let time = document.getElementById("time-per-questions").value;
-
+    let user = await fetchPlayer();
     socket.send(JSON.stringify({
         questionsPerRound: numQuestions,
         numberOfRounds: numRounds,
         roundLength: time*1000,
-        player: await fetchPlayer(),
+        player: user['user'],
         requestType: "CREATE"
     }));
 
     document.getElementById("game-options").classList.add("hidden");
+}
+
+function showWaitingScreen() {
+    document.getElementById('join-code-header').textContent = "Waiting for game to start...";
+    document.getElementById('join-code').innerHTML = "";
+    document.getElementById('actions').innerHTML = "";
 }
 
 /**
@@ -160,23 +174,21 @@ function startGame() {
 
 async function joinGame() {
     gameID = getGameIdFromInputs();
-
-    document.getElementById('join-code-header').textContent = "Waiting for game to start...";
-    document.getElementById('join-code').innerHTML = "";
-    document.getElementById('actions').innerHTML = "";
-
+    let user = await fetchPlayer();
     socket.send(JSON.stringify({
         gameID: gameID,
-        player: await fetchPlayer(),
+        player: user['user'],
         requestType: "JOIN"
     }));
 }
 
-function sendAnswer(answer) {
+async function sendAnswer(answer) {
+    let user = await fetchPlayer();
     socket.send(JSON.stringify({
         answer: answer,
         requestType: "ANSWER",
-        gameID: gameID
+        gameID: gameID,
+        player: user['user']
     }));
 }
 
