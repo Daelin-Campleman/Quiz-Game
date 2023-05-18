@@ -102,6 +102,7 @@ socket.onmessage = async (event) => {
         document.getElementById("actions").classList.add("hidden");
         document.getElementById("player-list").classList.add("hidden");
         document.getElementById("start-btn").classList.add("hidden");
+        document.getElementById("logo-img").classList.add("hidden");
 
 
         document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
@@ -113,6 +114,8 @@ socket.onmessage = async (event) => {
             let answer = answers[i];
             let answerElem = document.getElementById("answer-" + (i+1));
             answerElem.textContent = answer;
+            answerElem.classList.remove("disabled");
+            answerElem.classList.remove("selected");
         }
 
         startTimer(questionTime);

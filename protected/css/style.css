@@ -245,6 +245,10 @@ section.grid {
     transform: scale(0.9);
 }
 
+.btn.answer-btn.selected {
+    transform: scale(1.1);
+}
+
 .divider {
     width:300px;
 }
@@ -394,7 +398,8 @@ footer {
 #question.hidden,
 #start-btn.hidden,
 #timer.hidden,
-#game-options.hidden {
+#game-options.hidden,
+#logo-img.hidden {
     display: none;
 }
 
@@ -506,7 +511,7 @@ footer {
         width: 100%;
         min-height: 3em;
         line-height: 1em;
-        margin-bottom: 1em;
+        margin-bottom: 0.5em;
         font-size: 1.2rem;
     }
 
