@@ -2,9 +2,6 @@
 import { getQuestions, getAPIQuestions } from "./questions.js";
 import {saveGameLeaderBoard} from "../db/leaderboardRepository.js"
 
-// let questionsList = await getAPIQuestions();
-let questionsList = getQuestions()
-
 function Player(ws, score, currentAnswer) {
   this.ws = ws;
   this.score = score;
@@ -25,24 +22,25 @@ const liveGames = new Map();
  */
 export function createGame(startingPlayer, gameOptions) {
   const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-  let gameID = getRandomCode();
-  let game = {
-    players: [new Player(startingPlayer, 0, "")],
-    // questionsPerRound: gameOptions['numberOfQuestionsPerRound'],
-    questionsPerRound: 2,
-    // numberofRounds: gameOptions['numberOfRounds'],
-    numberOfRounds: 3,
-    currentRound: 1,
-    currentQuestion: 1,
-    started: false,
-    questions: getQuestions(),
-    intervalID: 0
-  };
-  liveGames.set(gameID, game);
-  // We might want to send PlayerID here for further communication
-  startingPlayer.send(JSON.stringify({
-    gameID: gameID
-  }));
+  getQuestions(gameOptions).then((quesitions) => {
+    let gameID = getRandomCode();
+    let game = {
+      players: [new Player(startingPlayer, 0, "")],
+      questionsPerRound: gameOptions.questionsPerRound || 5,
+      numberOfRounds: gameOptions.numberOfRounds || 3,
+      currentRound: 1,
+      currentQuestion: 1,
+      started: false,
+      questions: quesitions,
+      intervalID: 0,
+      roundTime: gameOptions.roundLength || 5000
+    };
+    liveGames.set(gameID, game);
+    // We might want to send PlayerID here for further communication
+    startingPlayer.send(JSON.stringify({
+      gameID: gameID
+    }));
+  })
 }
 
 /**
@@ -122,7 +120,7 @@ function sendQuestions(question, gameID) {
  */
 export function startGame(gameID) {
   const game = liveGames.get(gameID);
-  sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+  sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
   game.intervalID = setInterval(() => {
     questionOver(gameID);
   }, 2000);
@@ -147,22 +145,23 @@ export function questionOver(gameID) {
   if (game.currentQuestion > game.questionsPerRound) {
     roundOver(gameID);
   } else {
-    sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+    sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
   }
 }
 
 function roundOver(gameID) {
   //TODO: maybe send something saying that the round is over?
+  //TODO: Fetch new questions for next round, otherwise questions repeat
   const game = liveGames.get(gameID);
   clearInterval(game.intervalID);
   game.currentQuestion = 1;
-  game.currentRound++;
+  game.currentRound += 1;
   if (game.currentRound > game.numberOfRounds) {
     endGame(gameID);
   } else {
     //Delay each round by 5s
     setTimeout(() => {
-      sendQuestions(questionsList[calculateQuestionNumber(gameID)], gameID);
+      sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
       game.intervalID = setInterval(() => {
         questionOver(gameID);
       }, 2000);
