@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizWizzyZilla Trivia Tournament</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+
+<body class="container">
+
+    <header>
+        <article id="timer" class="hidden">
+            <section class="timer-full"></section>
+            <section class="timer-remaining"></section>
+            <p id="time-remaining">00:00</p>
+        </article>
+
+        <img src="../images/logo-with-text.svg" alt="logo" class="logo-small">
+    </header>
+
+    <h5 id="join-code-header"></h5>
+    <section id="join-code"></section>
+    <section id="actions"></section>
+    <section id="game-options" class="hidden">
+        <label for="number-of-questions">Number of Questions</label>
+        <input type="number" id="number-of-questions" min="1" value="10" />
+        <label for="number-of-rounds">Number of Rounds</label>
+        <input type="number" id="number-of-rounds" min="1" value="5" />
+        <label for="time-per-questions">Seconds per Question</label>
+        <input type="number" id="time-per-questions" min="1" max="60" value="20" />
+
+        <button class="btn" id="create-game">Create Game</button>
+    </section>
+
+    <ul id="player-list" class="hidden"></ul>
+
+    <section id="question" class="hidden">
+        <h2 id="question-text"></h2>
+    </section>
+    <section id="answers" class="hidden">
+        <button id="answer-1" class="btn"></button>
+        <button id="answer-2" class="btn"></button>
+        <button id="answer-3" class="btn"></button>
+        <button id="answer-4" class="btn"></button>
+    </section>
+
+    <!-- <form name="joinGameForm" id="myForm" action="javascript:joinGame()">
+        Enter join code: <br>
+        <input type="text" id="inputbox" name="name" value="">
+        <input type="submit">
+    </form>
+
+    <form name="answerBod" id="myAnswer" action="javascript:sendAnswer()">
+        Enter answer: <br>
+        <input type="text" id="answerbox" name="name" value="">
+        <input type="submit">
+    </form> -->
+
+    <button class="btn hidden" id="start-btn">Start</button>
+
+    <script src="../js/client.js"></script>
+</body>
+
+</html>

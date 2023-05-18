@@ -12,16 +12,17 @@
 <body class="container">
 
     <header>
-        <img src="images/logo.svg" alt="logo">
-        <h1 id="name-heading"></h1>
+        <img src="images/logo-with-text.svg" alt="logo">
+        <h1 id="name-heading"> Welcome to the <br /> QuizWizzyZilla Trivia Tournament</h1>
     </header>
 
     <main>
-        <section class="bottom-third">
-            <button class="btn" id="start-btn">Start</button>
-            <br />
-            <p id="error-message"></p>
-        </section>
+        <p>Choose a provider to sign in with</p>
+        <hr class="divider" />
+        <button class="single-signin" id="start-btn" data-provider="google"><img src="images/btn_google_signin_light_normal_web@2x.png" width="300"></button>
+        <!-- <button class="single-signin" id="start-btn" data-provider="facebook"><img src="images/facebook.png" width="300"></button> -->
+        <br />
+        <p id="error-message"></p>
     </main>
 
     <script src="js/index.js" type="module"></script>
