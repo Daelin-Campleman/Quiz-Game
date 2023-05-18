@@ -120,7 +120,11 @@ socket.onmessage = async (event) => {
 
         startTimer(questionTime);
     } else if (response['message'] == "GAME OVER"){
-        alert("The game is over, lol, you scored " + response['score']);
+        let playerDetails = response['playerDetails'];
+
+        localStorage.setItem("playerDetails", playerDetails);
+
+        window.location = "/home/results";
     }
 };
 

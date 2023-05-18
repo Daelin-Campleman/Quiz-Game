@@ -209,10 +209,17 @@ function endGame(gameID) {
   clearInterval(game.intervalID);
   console.log(`Game ended: ${gameID}`)
   const players = game.players;
+  const playerDetails = players.map((p) => {
+    return {
+      name: p.name,
+      score: p.score
+    }
+  });
   players.forEach(p => {
     p.ws.send(JSON.stringify({
       "message": "GAME OVER",
-      "score": p.score
+      "score": p.score,
+      "playerDetails": playerDetails
     }))
   });
   sendToDB(gameID);
