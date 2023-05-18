@@ -13,8 +13,5 @@ if (window.location.host.includes("-qa")) {
 document.getElementById("start-btn").addEventListener("click", function (event) {
     let provider = event.currentTarget.dataset.provider;
 
-    console.log(provider);
-
     window.location = `/auth/login/federated/${provider}`;
-
 });

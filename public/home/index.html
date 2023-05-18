@@ -9,15 +9,25 @@
     <link rel="stylesheet" href="../css/style.css">
 </head>
 
-<body>
+<body class="container">
 
-    <script src="../js/client.js"></script>
+    <header>
+        <img src="../images/logo-with-text.svg" alt="logo">
+    </header>
 
-    <button onclick="createGame()">Create Game</button>
-    <button onclick="startGame()">Start</button>
+    
+    <main>
+        <button class="btn" onclick="goTo('../game?create')">Create Game</button>
+        <button class="btn" onclick="goTo('../game?join')">Join Game</button>
+    </main>
+    
+    <script>
+        function goTo(url){
+            window.location = url;
+        }
+    </script>
 
-
-    <form name="joinGameForm" id="myForm" action="javascript:joinGame()">
+    <!-- <form name="joinGameForm" id="myForm" action="javascript:joinGame()">
         Enter join code: <br>
         <input type="text" id="inputbox" name="name" value="">
         <input type="submit">
@@ -27,10 +37,7 @@
         Enter answer: <br>
         <input type="text" id="answerbox" name="name" value="">
         <input type="submit">
-    </form>
-
-
-
+    </form> -->
 </body>
 
 </html>
