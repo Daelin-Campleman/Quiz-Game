@@ -7,7 +7,13 @@ async function fetchName() {
     let response = await fetch("/auth/user");
     let data = await response.json();
     return data.user.name;
-  }
+}
+
+async function fetchPlayer() {
+    let response = await fetch("/auth/user");
+    let data = await response.json();
+    return data;
+}
 
 // on socket connection
 socket.onopen = () => {
@@ -102,7 +108,7 @@ socket.onmessage = async (event) => {
     }
 };
 
-function createGame() {
+async function createGame() {
     let numQuestions = document.getElementById("number-of-questions").value;
     let numRounds = document.getElementById("number-of-rounds").value;
     let time = document.getElementById("time-per-questions").value;
@@ -111,6 +117,7 @@ function createGame() {
         questionsPerRound: numQuestions,
         numberOfRounds: numRounds,
         roundLength: time*1000,
+        player: await fetchPlayer(),
         requestType: "CREATE"
     }));
 
@@ -131,7 +138,7 @@ function startGame() {
     );
 }
 
-function joinGame() {
+async function joinGame() {
     gameID = getGameIdFromInputs();
 
     document.getElementById('join-code-header').textContent = "Waiting for game to start...";
@@ -140,6 +147,7 @@ function joinGame() {
 
     socket.send(JSON.stringify({
         gameID: gameID,
+        player: await fetchPlayer(),
         requestType: "JOIN"
     }));
 }
@@ -167,6 +175,7 @@ function createJoinCodeForm(givenCode){
         input.id = `digit-${i}`;
         input.name = `digit-${i}`;
         input.className = "singleInput";
+        input.maxLength = 1;
 
         if(i < 5){
             input.setAttribute('data-next', `digit-${i+1}`);
@@ -225,7 +234,10 @@ function createJoinCodeForm(givenCode){
             } else if((event.keyCode >= 65 && event.keyCode <= 90) || (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || event.keyCode === 39){
                 if(next != null){
                     let nextInput = document.getElementById(next);
-                    nextInput.focus();
+                    if(input.value != ""){
+                        nextInput.focus();
+                    }
+                    
                 }
             }
 
@@ -308,3 +320,37 @@ function showGameOptions(){
 }
 
 document.getElementById("create-game").addEventListener("click", createGame);
+
+
+
+function test(event){
+    let next = event.target.getAttribute('data-next');
+            let previous = event.target.getAttribute('data-previous');
+
+            if(event.keyCode === 8 || event.keyCode === 37){
+                if(previous != null){
+                    let previousInput = document.getElementById(previous);
+                    previousInput.focus();
+                }
+            } else if((event.keyCode >= 65 && event.keyCode <= 90) || (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || event.keyCode === 39){
+                if(next != null){
+                    let nextInput = document.getElementById(next);
+                    if(input.value != ""){
+                        nextInput.focus();
+                    }
+                    
+                }
+            }
+
+            let isValid = Array.from(inputs).every(input => { return input.value != ""; });
+
+            if(isValid){
+                document.getElementById('digit-group').classList.add('valid');
+                document.getElementById("join-btn").disabled = false;
+                document.getElementById("join-btn").classList.remove('disabled');
+            } else {
+                document.getElementById('digit-group').classList.remove('valid');
+                document.getElementById("join-btn").disabled = true;
+                document.getElementById("join-btn").classList.add('disabled');
+            }
+}

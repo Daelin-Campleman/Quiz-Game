@@ -1,5 +1,3 @@
-import axios from "axios";
-
 /**
  * See https://the-trivia-api.com/docs/v2/#tag/Questions/operation/getRandomQuestions for explanation of each param.
  * 
@@ -13,7 +11,8 @@ async function getQuestions(gameOptions) {
         difficulties: "easy,medium,hard"
     }
     let finalGameOptions = {...defaultOptions, ...gameOptions};
-    let { data } = await axios.get(URL + `?limit=${finalGameOptions.questionsPerRound * finalGameOptions.numberOfRounds}&categories=${finalGameOptions.categories}&difficulties=${finalGameOptions.difficulties}`);
+    let res = await fetch(URL + `?limit=${finalGameOptions.questionsPerRound * finalGameOptions.numberOfRounds}&categories=${finalGameOptions.categories}&difficulties=${finalGameOptions.difficulties}`);
+    let data = await res.json()
     return data;
 }
 
