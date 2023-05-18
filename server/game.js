@@ -124,10 +124,23 @@ function sendQuestions(question, gameID) {
     players.forEach(p => {
       p.ws.send(JSON.stringify({
         "text": question.question,
-        "options": [...question.incorrectAnswers, question.correctAnswer] //TODO: shuffle
+        "options": shuffleArray([...question.incorrectAnswers, question.correctAnswer])
       }));
     })
   }
+}
+
+/**
+ * 
+ * @param {array} array 
+ * @returns shuffled array
+ */
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
 /**
