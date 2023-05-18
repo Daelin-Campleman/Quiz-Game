@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizWizzyZilla Trivia Tournament</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body class="container">
+
+    <header>
+        <img src="./images/logo-with-text.svg" alt="logo">
+    </header>
+
+
+    <main>
+        <button class="btn" onclick="goTo('./game?create')">Create Game</button>
+        <button class="btn" onclick="goTo('./game?join')">Join Game</button>
+    </main>
+
+    <script>
+        function goTo(url) {
+            window.location = url;
+        }
+    </script>
+
+    <!-- <form name="joinGameForm" id="myForm" action="javascript:joinGame()">
+        Enter join code: <br>
+        <input type="text" id="inputbox" name="name" value="">
+        <input type="submit">
+    </form>
+
+    <form name="answerBod" id="myAnswer" action="javascript:sendAnswer()">
+        Enter answer: <br>
+        <input type="text" id="answerbox" name="name" value="">
+        <input type="submit">
+    </form> -->
+</body>
+
+</html>
