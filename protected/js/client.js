@@ -53,9 +53,9 @@ socket.onmessage = async (event) => {
         let qrCode = document.createElement('img');
         let link = "";
         if(window.location.host.includes("-qa")){
-            link = `http://quizwizzyzilla-qa.azurewebsites.net/game?join=${gameID}`;
+            link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${gameID}`;
         } else {
-            link = `http://quiz.stuffs.co.za/game?join=${gameID}`;
+            link = `http://quiz.stuffs.co.za/home/game?join=${gameID}`;
         }
         qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
         document.getElementById('join-code').appendChild(joinCode);
