@@ -33,21 +33,8 @@ server.listen(PORT, () => {
     );
   });
   
-  // import express
-  // import express, { response } from "express";
-  // const app = express();
-  
-  // const port = process.env.PORT || 8090;
-  
-  // const server = app.listen(port, () => {
-    //   console.log(`Listening on port ${port}`);
-    // });
+const wss = new WebSocketServer({ server: server });
     
-    
-    
-    const wss = new WebSocketServer({ server: server });
-    
-
 wss.getUniqueID = function () {
   // https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
   function s4() {
