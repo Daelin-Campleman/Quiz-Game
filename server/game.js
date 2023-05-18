@@ -26,13 +26,13 @@ const liveGames = new Map();
  * *
  * Creates a new game and stores it in liveGames. 
  */
-export async function createGame(startingPlayer, gameOptions) {
+export function createGame(startingPlayer, gameOptions) {
   const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
 
-  getQuestions(gameOptions).then((quesitions) => {
+  getQuestions(gameOptions).then(async (quesitions) => {
     let gameID = getRandomCode();
     let game = {
-      players: [new Player(startingPlayer, "test", 0, "")],
+      players: [new Player(startingPlayer, "test name", 0, "")],
       questionsPerRound: gameOptions.questionsPerRound || 5,
       numberOfRounds: gameOptions.numberOfRounds || 3,
       currentRound: 1,
@@ -79,7 +79,7 @@ export function clientAnswer(client, gameID, answer) {
  * Adds new player to game
  */
 
-export async function joinGame(socket, gameID) {
+export function joinGame(socket, gameID) {
   const game = liveGames.get(gameID);
   if (game === undefined) {
     socket.send("Game does not exist."); // should probably be a JSON object but works for now
@@ -90,7 +90,7 @@ export async function joinGame(socket, gameID) {
     if (player !== undefined) {
       socket.send("Player already in game"); 
     } else {
-      game.players.push(new Player(socket, "test", 0, ""));
+      game.players.push(new Player(socket, "test name", 0, ""));
 
       game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
 
