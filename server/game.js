@@ -117,14 +117,17 @@ export function joinGame(socket, gameID) {
  * *
  * Sends a question to a all clients in game
  */
-function sendQuestions(question, gameID) {
+function sendQuestions(question, gameID, quesitonNumber, roundNumber, roundTime) {
   const game = liveGames.get(gameID);
   if (game != undefined) {
     const players = game.players;
     players.forEach(p => {
       p.ws.send(JSON.stringify({
         "text": question.question,
-        "options": shuffleArray([...question.incorrectAnswers, question.correctAnswer])
+        "options": shuffleArray([...question.incorrectAnswers, question.correctAnswer]),
+        questionNumber: quesitonNumber,
+        roundNumber: roundNumber,
+        roundTime, roundTime
       }));
     })
   }
@@ -193,10 +196,10 @@ function roundOver(gameID) {
   } else {
     //Delay each round by 5s
     setTimeout(() => {
-      sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
+      sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID, game.currentQuestion, game.currentRound, game.roundTime);
       game.intervalID = setInterval(() => {
         questionOver(gameID);
-      }, 2000);
+      }, game.roundTime);
     }, 5000);
   }
 }
