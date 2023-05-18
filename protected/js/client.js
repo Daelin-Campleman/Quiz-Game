@@ -42,7 +42,7 @@ let playerID = "";
 socket.onmessage = async (event) => {
     console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
-    console.log(response);
+
     if (response['gameID'] != undefined) {
         gameID = response['gameID'];
 
@@ -51,7 +51,12 @@ socket.onmessage = async (event) => {
         let joinCode = document.createElement('h3');
         joinCode.textContent = gameID;
         let qrCode = document.createElement('img');
-        let link = `http://quiz.stuffs.co.za/game?join=${gameID}`;
+        let link = "";
+        if(window.location.host.includes("-qa")){
+            link = `http://quizwizzyzilla-qa.azurewebsites.net/game?join=${gameID}`;
+        } else {
+            link = `http://quiz.stuffs.co.za/game?join=${gameID}`;
+        }
         qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
         document.getElementById('join-code').appendChild(joinCode);
         document.getElementById('join-code').appendChild(qrCode);
@@ -98,7 +103,6 @@ socket.onmessage = async (event) => {
         document.getElementById("player-list").classList.add("hidden");
         document.getElementById("start-btn").classList.add("hidden");
 
-        console.log(response);
 
         document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
 
@@ -112,6 +116,8 @@ socket.onmessage = async (event) => {
         }
 
         startTimer(questionTime);
+    } else if (response['message'] == "GAME OVER"){
+        alert("The game is over, lol, you scored " + response['score']);
     }
 };
 
@@ -327,13 +333,23 @@ function showGameOptions(){
 
 document.getElementById("create-game").addEventListener("click", createGame);
 
-let ansBtns = document.getElementsByClassName("answer-btn");
-
-Array.from(ansBtns).forEach(btn => {
+for(let i = 0; i < 4; i++){
+    let btn = document.getElementById(`answer-${i+1}`);
     btn.addEventListener("click", (event) => {
-        sendAnswer(event.currentTarget.textContent);
+        let allBtns = document.getElementsByClassName("answer-btn");
+        Array.from(allBtns).forEach(btn2 => {
+            if(btn != btn2){
+                btn2.classList.add("disabled");
+                btn2.classList.remove("selected");
+            } else {
+                btn2.classList.remove("disabled");
+                btn2.classList.add("selected");
+            }
+        });
+
+        sendAnswer(event.currentTarget.value);
     });
-});
+}
 
 
 

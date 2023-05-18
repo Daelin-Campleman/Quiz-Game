@@ -237,6 +237,14 @@ section.grid {
     cursor: not-allowed;
 }
 
+.btn.answer-btn {
+    transition: 0.3s;
+}
+
+.btn.answer-btn.disabled {
+    transform: scale(0.9);
+}
+
 .divider {
     width:300px;
 }
@@ -258,7 +266,7 @@ section.grid {
     margin-bottom: 1em;
 }
 
-.btn:hover {
+.btn:hover, .btn.selected {
     animation: ani 8s linear infinite;
     border: none;
     cursor: pointer;
@@ -288,7 +296,7 @@ section.grid {
     transition: 1s;
 }
 
-.btn:hover::before {
+.btn:hover::before, .btn.selected::before {
     filter: blur(20px);
 }
 
