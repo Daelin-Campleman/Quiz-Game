@@ -11,7 +11,11 @@ import passportGoogle from "../services/passport/passport-google.js";
 const authRouter = Router()
 
 authRouter.get('/login', function(req, res, next) {
-  res.sendFile(path.join(__dirname + '/../public/login.html'));
+  res.redirect('/');
+});
+
+authRouter.get('/images/logo.svg', function(req, res, next) {
+  res.sendFile(path.join(__dirname + '/../public/images/logo.svg'));
 });
 
 authRouter.get('/images/logo.svg', function(req, res, next) {
