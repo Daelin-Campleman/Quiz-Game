@@ -120,6 +120,7 @@ socket.onmessage = async (event) => {
 
         startTimer(questionTime);
     } else if (response['message'] == "GAME OVER"){
+        console.log(response);
         let playerDetails = response['playerDetails'];
 
         localStorage.setItem("playerDetails", playerDetails);
