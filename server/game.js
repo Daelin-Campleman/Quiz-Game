@@ -1,12 +1,18 @@
-
 import { getQuestions, getAPIQuestions } from "./questions.js";
 import {saveGameLeaderBoard} from "../db/leaderboardRepository.js"
 
-function Player(ws, score, currentAnswer) {
+function Player(ws, name, score, currentAnswer) {
   this.ws = ws;
+  this.name = name;
   this.score = score;
   this.currentAnswer = currentAnswer;
   this.answerHistory = []
+}
+
+async function fetchName() {
+  let response = await fetch("/auth/user");
+  let data = await response.json();
+  return data.user.name;
 }
 
 // Stores current games in memory
@@ -20,12 +26,13 @@ const liveGames = new Map();
  * *
  * Creates a new game and stores it in liveGames. 
  */
-export function createGame(startingPlayer, gameOptions) {
+export async function createGame(startingPlayer, gameOptions) {
   const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
+
   getQuestions(gameOptions).then((quesitions) => {
     let gameID = getRandomCode();
     let game = {
-      players: [new Player(startingPlayer, 0, "")],
+      players: [new Player(startingPlayer, await fetchName(), 0, "")],
       questionsPerRound: gameOptions.questionsPerRound || 5,
       numberOfRounds: gameOptions.numberOfRounds || 3,
       currentRound: 1,
@@ -72,7 +79,7 @@ export function clientAnswer(client, gameID, answer) {
  * Adds new player to game
  */
 
-export function joinGame(socket, gameID) {
+export async function joinGame(socket, gameID) {
   const game = liveGames.get(gameID);
   if (game === undefined) {
     socket.send("Game does not exist."); // should probably be a JSON object but works for now
@@ -83,8 +90,20 @@ export function joinGame(socket, gameID) {
     if (player !== undefined) {
       socket.send("Player already in game"); 
     } else {
-      game.players.push(new Player(socket, 0, ""));
-      socket.send(JSON.stringify({...game, success: true, message: "Successfuly Joined Game"}));
+      game.players.push(new Player(socket, await fetchName(), 0, ""));
+
+      game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
+
+      //socket.send(JSON.stringify({...game, success: true, message: "Successfully Joined Game"}));
+
+      // for(let i = 0; i < game.players.length-1; i++) {
+      //   console.log("Sending new player message");
+      //   game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
+      // }
+
+      //game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
+      
+      socket.send(JSON.stringify({success: true, message: "Successfully Joined Game"}));
       console.log(liveGames);
     }
   }
@@ -123,7 +142,7 @@ export function startGame(gameID) {
   sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
   game.intervalID = setInterval(() => {
     questionOver(gameID);
-  }, 2000);
+  }, 10000);
 }
 
 //Triggers every question interval
