@@ -354,7 +354,8 @@ for(let i = 0; i < 4; i++){
             }
         });
 
-        sendAnswer(event.currentTarget.value);
+        console.log(event.currentTarget.textContent);
+        sendAnswer(event.currentTarget.textContent);
     });
 }
 
