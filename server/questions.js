@@ -1,5 +1,3 @@
-import axios from "axios";
-
 /**
  * See https://the-trivia-api.com/docs/v2/#tag/Questions/operation/getRandomQuestions for explanation of each param.
  * 
