@@ -155,10 +155,10 @@ function shuffleArray(array) {
  */
 export function startGame(gameID) {
   const game = liveGames.get(gameID);
-  sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
+  sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID, game.currentQuestion, game.currentRound, game.roundTime);
   game.intervalID = setInterval(() => {
     questionOver(gameID);
-  }, 10000);
+  }, game.roundTime);
 }
 
 //Triggers every question interval
@@ -180,7 +180,7 @@ export function questionOver(gameID) {
   if (game.currentQuestion > game.questionsPerRound) {
     roundOver(gameID);
   } else {
-    sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
+    sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID, game.currentQuestion, game.currentRound, game.roundTime);
   }
 }
 

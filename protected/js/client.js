@@ -86,6 +86,9 @@ socket.onmessage = async (event) => {
         document.getElementById("join-code-header").textContent = "";
         let question = response['text']['text'];
         let answers = response['options'];
+        let questionNumber = response['questionNumber'];
+        let roundNumber = response['roundNumber'];
+        let questionTime = response['roundTime'];
 
         document.getElementById("question").classList.remove("hidden");
         document.getElementById("answers").classList.remove("hidden");
@@ -94,6 +97,10 @@ socket.onmessage = async (event) => {
         document.getElementById("actions").classList.add("hidden");
         document.getElementById("player-list").classList.add("hidden");
         document.getElementById("start-btn").classList.add("hidden");
+
+        console.log(response);
+
+        document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
 
         let questionElem = document.getElementById("question-text");
         questionElem.textContent = question;
@@ -104,7 +111,7 @@ socket.onmessage = async (event) => {
             answerElem.textContent = answer;
         }
 
-        startTimer(10000);
+        startTimer(questionTime);
     }
 };
 

@@ -421,9 +421,9 @@ footer {
 }
 
 #timer {
-    width: 100%;
+    width: 95%;
     height: 50px;
-    margin-bottom: 0.5em;
+    margin: 0.5em auto;
     vertical-align: middle;
     position: relative;
 }
@@ -490,4 +490,19 @@ footer {
     font-weight: bold;
     color: #380036;
     text-align: center;
+}
+
+/* @media for mobile */
+@media screen and (max-width: 768px) {
+    #answers > button {
+        width: 100%;
+        min-height: 3em;
+        line-height: 1em;
+        margin-bottom: 1em;
+        font-size: 1.2rem;
+    }
+
+    #question {
+        font-size: 1rem;
+    } 
 }
