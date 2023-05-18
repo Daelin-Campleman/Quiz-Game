@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <script src="https://kit.fontawesome.com/f4575d860e.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/leaderboard.css">
+</head>
+
+<body class="container">
+
+    <header>
+        <img src="./images/logo.svg" alt="logo">
+    </header>
+
+    <main>
+        <h1>Times Up!</h1>
+        <h2>Winners</h2>
+
+        <ul>
+            <li id="second">
+                <i class="fa-solid fa-trophy" style="color: #c0c0c0;"></i>
+                <h3>Bob</h3>
+            </li>
+            <li id="first">
+                <i class="fa-solid fa-trophy fa-bounce" style="color: #ffd700;"></i>
+                <h3>Bob</h3>
+            </li>
+            <li id="third">
+                <i class="fa-solid fa-trophy" style="color: #967444;"></i>
+                <h3>Bob</h3>
+            </li>
+        </ul>
+        <hr>
+
+
+        <h2>Leaderboard</h2>
+        <table>
+            <tr>
+                <th colspan="2">Player</th>
+                <th>Score</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>John Wick</td>
+                <td>20</td>
+            </tr>
+
+            <tr>
+                <td>2</td>
+                <td>Brad Bad</td>
+                <td>18</td>
+            </tr>
+
+            <tr>
+                <td>3</td>
+                <td>Mad Lad</td>
+                <td>15</td>
+            </tr>
+
+            <tr>
+                <td>4</td>
+                <td>Selena Gomez</td>
+                <td>14</td>
+            </tr>
+
+            <tr>
+                <td>5</td>
+                <td>Lal Lamba</td>
+                <td>12</td>
+            </tr>
+        </table>
+
+    </main>
+
+    <script>
+        function goTo(url) {
+            window.location = url;
+        }
+    </script>
+
+    <script src="./js/leaderboard.js"></script>
+</body>
+
+</html>

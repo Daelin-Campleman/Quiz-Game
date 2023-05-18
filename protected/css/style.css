@@ -5,7 +5,7 @@ body {
 }
 
 .container {
-    display: flex;
+    display: grid;
     flex-flow: column;
     width: 100%;
     margin: 0 auto;
@@ -33,7 +33,7 @@ header {
 }
 
 header img {
-    width: 20%;
+    height: 10vw;
 }
 
 header img.logo-small {
@@ -223,7 +223,7 @@ section.grid {
     border-radius: 30px;
     border: none;
     z-index: 1;
-    margin:1em;
+    margin: 1em;
 }
 
 /* .btn disabled */
@@ -238,7 +238,7 @@ section.grid {
 }
 
 .divider {
-    width:300px;
+    width: 300px;
 }
 
 .single-signin {
@@ -358,11 +358,11 @@ a.btn {
     flex: 0 1 auto;
 }
 
-#actions{
+#actions {
     flex: 0 1 auto;
 }
 
-#player-list  {
+#player-list {
     display: flex;
     flex-flow: column;
     flex: 1 1 auto;
@@ -390,8 +390,8 @@ footer {
     display: none;
 }
 
-#answers > button {
-    width:40%;
+#answers>button {
+    width: 40%;
     min-height: 5em;
     line-height: 1em;
     margin-bottom: 1em;
