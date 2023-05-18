@@ -32,7 +32,7 @@ export async function createGame(startingPlayer, gameOptions) {
   getQuestions(gameOptions).then((quesitions) => {
     let gameID = getRandomCode();
     let game = {
-      players: [new Player(startingPlayer, await fetchName(), 0, "")],
+      players: [new Player(startingPlayer, "test", 0, "")],
       questionsPerRound: gameOptions.questionsPerRound || 5,
       numberOfRounds: gameOptions.numberOfRounds || 3,
       currentRound: 1,
@@ -90,7 +90,7 @@ export async function joinGame(socket, gameID) {
     if (player !== undefined) {
       socket.send("Player already in game"); 
     } else {
-      game.players.push(new Player(socket, await fetchName(), 0, ""));
+      game.players.push(new Player(socket, "test", 0, ""));
 
       game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
 
