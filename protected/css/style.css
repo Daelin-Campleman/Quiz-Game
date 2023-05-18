@@ -517,5 +517,12 @@ footer {
 
     #question {
         font-size: 1rem;
-    } 
+    }
+
+    #digit-group input {
+        width: 35px;
+        height: 70px;
+        line-height: 70px;
+        font-size: 42px;
+    }
 }
