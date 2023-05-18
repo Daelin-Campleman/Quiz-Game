@@ -1,15 +1,32 @@
+import axios from "axios";
+
 /**
  * See https://the-trivia-api.com/docs/v2/#tag/Questions/operation/getRandomQuestions for explanation of each param.
  * 
  */
+async function getQuestions(gameOptions) {
+    const URL = "https://the-trivia-api.com/v2/questions"
+    const defaultOptions = {
+        questionsPerRound: 5,
+        numberOfRounds: 1,
+        categories: "science,film_and_tv,music,history,geography,art_and_literature,sport_and_leisure,general_knowledge,science,food_and_drink",
+        difficulties: "easy,medium,hard"
+    }
+    let finalGameOptions = {...defaultOptions, ...gameOptions};
+    let { data } = await axios.get(URL + `?limit=${finalGameOptions.questionsPerRound * finalGameOptions.numberOfRounds}&categories=${finalGameOptions.categories}&difficulties=${finalGameOptions.difficulties}`);
+    return data;
+}
 
-function getQuestions(
-        amount=50,
-        categories="science,film_and_tv,music,history,geography,art_and_literature,sport_and_leisure,general_knowledge,science,food_and_drink",
-        difficulties="easy,medium,hard",
-    ) {
-        // Default return for now, same form as API response though
-        return [
+ async function getAPIQuestions() {
+   var questions = await fetch("https://the-trivia-api.com/v2/questions");
+   return await questions.json();
+ }
+
+export { getQuestions, getAPIQuestions};
+
+
+/**
+ * return [
          {
              "category": "science",
              "id": "622a1c377cc59eab6f950487",
@@ -218,11 +235,4 @@ function getQuestions(
              "isNiche": false
          }
      ]
-    }
-
- async function getAPIQuestions() {
-   var questions = await fetch("https://the-trivia-api.com/v2/questions");
-   return await questions.json();
- }
-
-export { getQuestions, getAPIQuestions};
+ */
