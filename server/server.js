@@ -34,14 +34,6 @@ server.listen(PORT, () => {
   });
   
 const wss = new WebSocketServer({ server: server });
-    
-wss.getUniqueID = function () {
-  // https://stackoverflow.com/questions/13364243/websocketserver-node-js-how-to-differentiate-clients
-  function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-  }
-  return s4() + s4() + '-' + s4();
-};
 
 /**
  * 
@@ -58,10 +50,10 @@ function parseMessage(msg, ws) {
       createGame(ws, msg);
       break;
     case "JOIN":
-      joinGame(ws, msg['gameID']);
+      joinGame(ws, msg);
       break;
     case "ANSWER":
-      clientAnswer(ws, msg['gameID'], msg['answer']);
+      clientAnswer(ws, msg);
       break;
     case "START":
       startGame(msg['gameID']);
@@ -73,8 +65,6 @@ function parseMessage(msg, ws) {
 }
 
 wss.on("connection", (ws) => {
-  ws.id = wss.getUniqueID();
-  console.log(`client connected with id: ${ws.id}`)
   ws.on("message", (msg) => parseMessage(JSON.parse(msg), ws));
 });
 
