@@ -2,6 +2,8 @@
  * See https://the-trivia-api.com/docs/v2/#tag/Questions/operation/getRandomQuestions for explanation of each param.
  * 
  */
+import fetch from "node-fetch";
+
 async function getQuestions(gameOptions) {
     const URL = "https://the-trivia-api.com/v2/questions"
     const defaultOptions = {

@@ -1,12 +1,12 @@
 import { WebSocketServer } from "ws"; 
-import { createGame, joinGame, startGame, clientAnswer } from "./game.js";
+import { createGame, joinGame, startGame, clientAnswer, roundOver } from "./game.js";
 import http from "http";
 import debug from "debug";
 import { config } from "dotenv";
 import app from "../app.js";
+import { getGameLeaderboardRequest } from "../db/requests.js";
 
 config();
-
 
 const DEBUG = debug("dev");
 const PORT = process.env.PORT || 5000;
@@ -56,8 +56,10 @@ function parseMessage(msg, ws) {
       clientAnswer(ws, msg);
       break;
     case "START":
-      startGame(msg['gameID']);
+      startGame(msg['joinCode']);
       break;
+    case "NEXT ROUND":
+      roundOver(msg['joinCode'])
     default:
       return;
   }
