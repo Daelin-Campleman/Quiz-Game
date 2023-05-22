@@ -42,16 +42,22 @@ export const execSQLRequest = (sql) =>
       } else {
         //console.log("rowCount:",rowCount);
         if (result == "" || result == null || result == "null") result = "[]";
-        console.log("result:",result);
+        //console.log("result:",result);
         resolve(result);
       }
       connection.close();
     });
 
-    request.on('row', columns => { 
+    request.on('row', columns => {
+
+      let record = [];
+
       columns.forEach(column => {
-        result.push(column.value);
+        record.push(column.value);
     });
+
+    result.push(record);
+
   });
 
     connection.on("connect", (err) => {

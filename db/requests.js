@@ -1,7 +1,7 @@
 import { Request } from "tedious";
 import { execSQLRequest } from "./quizdb.js";
 
-export async function createGameRequest(joinCode, callback) {
+export function createGameRequest(joinCode, callback) {
 
     let sql = `
         INSERT INTO dbo.game (join_code)
@@ -9,7 +9,7 @@ export async function createGameRequest(joinCode, callback) {
         VALUES ('${joinCode}');
     `;
 
-    return await execSQLRequest(sql);
+    return execSQLRequest(sql);
 }
 
 export function getGameLeaderboardRequest(gameID, callback) {
