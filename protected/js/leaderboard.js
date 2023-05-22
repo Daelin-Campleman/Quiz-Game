@@ -41,3 +41,14 @@ function loadLeaderBoard(items) {
     }
 }
 loadLeaderBoard(res);
+fetchGame();
+
+async function fetchGame() {
+    let response = await fetch("/game/leaderboard");
+    let data = response;
+    console.log("hello!")
+    console.log(data);
+    console.log(data.json());
+    // return data.user.name;
+}
+
