@@ -63,7 +63,7 @@ export async function createGame(startingPlayer, gameOptions) {
 /**
  * 
  * @param {String} clientID 
- * @param {String} gameID 
+ * @param {String} gameId 
  * @param {String} answer 
  * 
  * *
@@ -85,7 +85,7 @@ export function clientAnswer(client, options) {
 /**
  * 
  * @param {Websocket} socket 
- * @param {String} gameID 
+ * @param {String} gameId 
  * 
  * *
  * Adds new player to game
@@ -126,7 +126,7 @@ export function joinGame(socket, gameOptions) {
 /**
  * 
  * @param {Object} question 
- * @param {string} gameID 
+ * @param {string} gameId 
  * 
  * *
  * Sends a question to a all clients in game
@@ -162,7 +162,7 @@ function shuffleArray(array) {
 
 /**
  * 
- * @param {String} gameID
+ * @param {String} gameId
  * 
  * *
  * Starts gameloop
@@ -256,7 +256,7 @@ async function sendToDB(joinCode) {
   const players = game.players;
   let playersSql = "";
   players.forEach(p => {
-    playersSql += `(\'${joinCode}\', \'${p.ws.id}\', ${p.score}),`
+    playersSql += `(\'${game.gameId}\', \'${p.ws.id}\', ${p.score}),`
   });
   playersSql = playersSql.slice(0, -1);
   saveGameLeaderBoard(playersSql).catch((err) => console.log(err));
