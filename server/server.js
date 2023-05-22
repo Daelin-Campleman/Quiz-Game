@@ -4,9 +4,9 @@ import http from "http";
 import debug from "debug";
 import { config } from "dotenv";
 import app from "../app.js";
+import { getGameLeaderboardRequest } from "../db/requests.js";
 
 config();
-
 
 const DEBUG = debug("dev");
 const PORT = process.env.PORT || 5000;

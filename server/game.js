@@ -1,5 +1,6 @@
-import { getQuestions, getAPIQuestions } from "./questions.js";
+import { getQuestions } from "./questions.js";
 import {saveGameLeaderBoard} from "../db/leaderboardRepository.js"
+import { createGameRequest } from "../db/requests.js";
 
 function Player(ws, name, score, currentAnswer) {
   this.ws = ws;
@@ -26,11 +27,15 @@ const liveGames = new Map();
  * *
  * Creates a new game and stores it in liveGames. 
  */
-export function createGame(startingPlayer, gameOptions) {
+export async function createGame(startingPlayer, gameOptions) {
   const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
+  let joinCode = getRandomCode();
+  var gameID;
+
+  const data = await createGameRequest(joinCode);
+  console.log(data);
 
   getQuestions(gameOptions).then(async (quesitions) => {
-    let gameID = getRandomCode();
     let game = {
       players: [new Player(startingPlayer, "test name", 0, "")],
       questionsPerRound: gameOptions.questionsPerRound || 5,
@@ -45,9 +50,9 @@ export function createGame(startingPlayer, gameOptions) {
     liveGames.set(gameID, game);
     // We might want to send PlayerID here for further communication
     startingPlayer.send(JSON.stringify({
-      gameID: gameID
+      joinCode: joinCode
     }));
-  })
+  });
 }
 
 /**
@@ -59,8 +64,8 @@ export function createGame(startingPlayer, gameOptions) {
  * *
  * Receives answer for player and stores in player object in game object in liveGames
  */
-export function clientAnswer(client, gameID, answer) {
-  const game = liveGames.get(gameID);
+export function clientAnswer(client, joinCode, answer) {
+  const game = liveGames.get(joinCode);
   const player = game.players.find(p => p.ws.id === client.id)
   if (player != undefined) {
     player.currentAnswer = answer;
@@ -79,8 +84,8 @@ export function clientAnswer(client, gameID, answer) {
  * Adds new player to game
  */
 
-export function joinGame(socket, gameID) {
-  const game = liveGames.get(gameID);
+export function joinGame(socket, joinCode) {
+  const game = liveGames.get(joinCode);
   if (game === undefined) {
     socket.send("Game does not exist."); // should probably be a JSON object but works for now
   } else if (game.started) {
@@ -93,15 +98,6 @@ export function joinGame(socket, gameID) {
       game.players.push(new Player(socket, "test name", 0, ""));
 
       game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
-
-      //socket.send(JSON.stringify({...game, success: true, message: "Successfully Joined Game"}));
-
-      // for(let i = 0; i < game.players.length-1; i++) {
-      //   console.log("Sending new player message");
-      //   game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
-      // }
-
-      //game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
       
       socket.send(JSON.stringify({success: true, message: "Successfully Joined Game"}));
       console.log(liveGames);
@@ -117,8 +113,8 @@ export function joinGame(socket, gameID) {
  * *
  * Sends a question to a all clients in game
  */
-function sendQuestions(question, gameID) {
-  const game = liveGames.get(gameID);
+function sendQuestions(question, joinCode) {
+  const game = liveGames.get(joinCode);
   if (game != undefined) {
     const players = game.players;
     players.forEach(p => {
@@ -137,20 +133,20 @@ function sendQuestions(question, gameID) {
  * *
  * Starts gameloop
  */
-export function startGame(gameID) {
-  const game = liveGames.get(gameID);
-  sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
+export function startGame(joinCode) {
+  const game = liveGames.get(joinCode);
+  sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode);
   game.intervalID = setInterval(() => {
-    questionOver(gameID);
+    questionOver(joinCode);
   }, 10000);
 }
 
 //Triggers every question interval
-export function questionOver(gameID) {
-  const game = liveGames.get(gameID);
+export function questionOver(joinCode) {
+  const game = liveGames.get(joinCode);
   console.log(`round: ${game.currentRound}, question: ${game.currentQuestion}`)
   const players = game.players;
-  let correctAnswer = game.questions[calculateQuestionNumber(gameID)].correctAnswer.trim().toUpperCase();
+  let correctAnswer = game.questions[calculateQuestionNumber(joinCode)].correctAnswer.trim().toUpperCase();
   game.currentQuestion++;
   players.forEach(p => {
     if (p.currentAnswer.trim().toUpperCase() === correctAnswer) {
@@ -162,36 +158,36 @@ export function questionOver(gameID) {
   });
   
   if (game.currentQuestion > game.questionsPerRound) {
-    roundOver(gameID);
+    roundOver(joinCode);
   } else {
-    sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
+    sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode);
   }
 }
 
-function roundOver(gameID) {
+function roundOver(joinCode) {
   //TODO: maybe send something saying that the round is over?
   //TODO: Fetch new questions for next round, otherwise questions repeat
-  const game = liveGames.get(gameID);
+  const game = liveGames.get(joinCode);
   clearInterval(game.intervalID);
   game.currentQuestion = 1;
   game.currentRound += 1;
   if (game.currentRound > game.numberOfRounds) {
-    endGame(gameID);
+    endGame(joinCode);
   } else {
     //Delay each round by 5s
     setTimeout(() => {
-      sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID);
+      sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode);
       game.intervalID = setInterval(() => {
-        questionOver(gameID);
+        questionOver(joinCode);
       }, 2000);
     }, 5000);
   }
 }
 
-function endGame(gameID) {
-  const game = liveGames.get(gameID);
+function endGame(joinCode) {
+  const game = liveGames.get(joinCode);
   clearInterval(game.intervalID);
-  console.log(`Game ended: ${gameID}`)
+  console.log(`Game ended: ${joinCode}`)
   const players = game.players;
   players.forEach(p => {
     p.ws.send(JSON.stringify({
@@ -199,21 +195,21 @@ function endGame(gameID) {
       "score": p.score
     }))
   });
-  sendToDB(gameID);
-  liveGames.delete(gameID);
+  sendToDB(joinCode);
+  liveGames.delete(joinCode);
 }
 
-function calculateQuestionNumber(gameID) { //might be better to randomly sample list of questions and just make sure it can't repeat
-  const game = liveGames.get(gameID);
+function calculateQuestionNumber(joinCode) { //might be better to randomly sample list of questions and just make sure it can't repeat
+  const game = liveGames.get(joinCode);
   return (game.currentRound - 1) * game.questionsPerRound + game.currentQuestion - 1;
 }
 
-async function sendToDB(gameID) {
-  const game = liveGames.get(gameID);
+async function sendToDB(joinCode) {
+  const game = liveGames.get(joinCode);
   const players = game.players;
   let playersSql = "";
   players.forEach(p => {
-    playersSql += `(\'${gameID}\', \'${p.ws.id}\', ${p.score}),`
+    playersSql += `(\'${joinCode}\', \'${p.ws.id}\', ${p.score}),`
   });
   playersSql = playersSql.slice(0, -1);
   saveGameLeaderBoard(playersSql).catch((err) => console.log(err));
