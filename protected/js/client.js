@@ -2,7 +2,7 @@ const wsURL = window.location.host.includes("localhost") ? `ws://${window.locati
 const socket = new WebSocket(wsURL);
 
 let timer;
-let gameID = "";
+let joinCode = "";
 
 async function fetchName() {
     let response = await fetch("/auth/user");
@@ -43,22 +43,22 @@ socket.onmessage = async (event) => {
     console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
 
-    if (response['gameID'] != undefined) {
-        gameID = response['gameID'];
+    if (response['joinCode'] != undefined) {
+        joinCode = response['joinCode'];
 
         document.getElementById('join-code').innerHTML = "";
 
-        let joinCode = document.createElement('h3');
-        joinCode.textContent = gameID;
+        let joinCodeEl = document.createElement('h3');
+        joinCodeEl.textContent = joinCode;
         let qrCode = document.createElement('img');
         let link = "";
         if(window.location.host.includes("-qa")){
-            link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${gameID}`;
+            link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${joinCode}`;
         } else {
-            link = `http://quiz.stuffs.co.za/home/game?join=${gameID}`;
+            link = `http://quiz.stuffs.co.za/home/game?join=${joinCode}`;
         }
         qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
-        document.getElementById('join-code').appendChild(joinCode);
+        document.getElementById('join-code').appendChild(joinCodeEl);
         document.getElementById('join-code').appendChild(qrCode);
         document.getElementById('join-code-header').textContent = "Use this code to join this game or scan the QR code";
 
@@ -163,20 +163,20 @@ function showWaitingScreen() {
  * Can be used to send new questions etc.
  */
 function startGame() {
-    console.log(`gameID: ${gameID}`)
+    console.log(`joinCode: ${joinCode}`)
     socket.send(
         JSON.stringify({
             requestType: "START",
-            gameID: gameID
+            joinCode: joinCode
         })
     );
 }
 
 async function joinGame() {
-    gameID = getGameIdFromInputs();
+    joinCode = getjoinCodeFromInputs();
     let user = await fetchPlayer();
     socket.send(JSON.stringify({
-        gameID: gameID,
+        joinCode: joinCode,
         player: user['user'],
         requestType: "JOIN"
     }));
@@ -187,7 +187,7 @@ async function sendAnswer(answer) {
     socket.send(JSON.stringify({
         answer: answer,
         requestType: "ANSWER",
-        gameID: gameID,
+        joinCode: joinCode,
         player: user['user']
     }));
 }
@@ -289,18 +289,18 @@ function createJoinCodeForm(givenCode){
     joinButton.addEventListener('click', joinGame);
 }
 
-function getGameIdFromInputs(){
+function getjoinCodeFromInputs(){
     let digitGroup = document.getElementById('digit-group');
 
     let inputs = digitGroup.getElementsByTagName('input');
 
-    let tmpGameId = "";
+    let tmpjoinCode = "";
 
     Array.from(inputs).forEach(input => {
-        tmpGameId += input.value;
+        tmpjoinCode += input.value;
     });
 
-    return tmpGameId.toUpperCase();
+    return tmpjoinCode.toUpperCase();
 }
 
 function createPlayerList(){

@@ -11,8 +11,8 @@ import { Router } from "express";
 const gameRouter = Router()
 
 gameRouter.get("/leaderboard", async (req, res) => {
-    let gameID = req.query.gameID;
-    getGameLeaderboard(gameID).then((leaderboard) => {
+    let joinCode = req.query.joinCode;
+    getGameLeaderboard(joinCode).then((leaderboard) => {
         res.send(JSON.stringify({
             leaderboard: leaderboard
         }))
@@ -23,7 +23,7 @@ gameRouter.get("/leaderboard", async (req, res) => {
 });
   
 gameRouter.get("/leaderboard/all", async (req, res) => {
-    let gameID = req.query.gameID;
+    let joinCode = req.query.joinCode;
     getTable().then((table) => {
         res.send(JSON.stringify({
             table: table
