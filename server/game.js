@@ -33,10 +33,10 @@ export async function createGame(startingPlayer, gameOptions) {
   var gameID;
 
   const data = await createGameRequest(joinCode);
-  console.log(data);
 
   getQuestions(gameOptions).then(async (quesitions) => {
     let game = {
+      gameId: data[0],
       players: [new Player(startingPlayer, "test name", 0, "")],
       questionsPerRound: gameOptions.questionsPerRound || 5,
       numberOfRounds: gameOptions.numberOfRounds || 3,
@@ -47,7 +47,7 @@ export async function createGame(startingPlayer, gameOptions) {
       intervalID: 0,
       roundTime: gameOptions.roundLength || 5000
     };
-    liveGames.set(gameID, game);
+    liveGames.set(joinCode, game);
     // We might want to send PlayerID here for further communication
     startingPlayer.send(JSON.stringify({
       joinCode: joinCode

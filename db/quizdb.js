@@ -34,7 +34,7 @@ export function createRequestT(sql) {
 export const execSQLRequest = (sql) =>
   new Promise((resolve, reject) => {
 
-    var result;
+    let result = [];
 
     const request = new Request(sql, (err, rowCount) => {
       if (err) {

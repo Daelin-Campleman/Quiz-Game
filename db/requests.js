@@ -5,6 +5,7 @@ export async function createGameRequest(joinCode, callback) {
 
     let sql = `
         INSERT INTO dbo.game (join_code)
+        OUTPUT INSERTED.game_id
         VALUES ('${joinCode}');
     `;
 
