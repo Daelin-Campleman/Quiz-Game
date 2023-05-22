@@ -2,12 +2,19 @@ const wsURL = window.location.host.includes("localhost") ? `ws://${window.locati
 const socket = new WebSocket(wsURL);
 
 let timer;
+let gameID = "";
 
 async function fetchName() {
     let response = await fetch("/auth/user");
     let data = await response.json();
     return data.user.name;
-  }
+}
+
+async function fetchPlayer() {
+    let response = await fetch("/auth/user");
+    let data = await response.json();
+    return data;
+}
 
 // on socket connection
 socket.onopen = () => {
@@ -31,12 +38,11 @@ socket.onopen = () => {
     }
 }
 
-let gameID = "";
 let playerID = "";
 socket.onmessage = async (event) => {
     console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
-    console.log(response);
+
     if (response['gameID'] != undefined) {
         gameID = response['gameID'];
 
@@ -45,7 +51,12 @@ socket.onmessage = async (event) => {
         let joinCode = document.createElement('h3');
         joinCode.textContent = gameID;
         let qrCode = document.createElement('img');
-        let link = `http://quiz.stuffs.co.za/game?join=${gameID}`;
+        let link = "";
+        if(window.location.host.includes("-qa")){
+            link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${gameID}`;
+        } else {
+            link = `http://quiz.stuffs.co.za/home/game?join=${gameID}`;
+        }
         qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
         document.getElementById('join-code').appendChild(joinCode);
         document.getElementById('join-code').appendChild(qrCode);
@@ -76,10 +87,20 @@ socket.onmessage = async (event) => {
             li.textContent = response['players'][i]['name'];
             document.getElementById('player-list').appendChild(li);
         }
-    } else if (response['text'] != undefined){
+    } else if (response['requestType'] === "JOIN") {
+        if (response['success']) {
+            showWaitingScreen();
+        } else {
+            alert(response['message']);
+        }
+    }
+    else if (response['text'] != undefined){
         document.getElementById("join-code-header").textContent = "";
         let question = response['text']['text'];
         let answers = response['options'];
+        let questionNumber = response['questionNumber'];
+        let roundNumber = response['roundNumber'];
+        let questionTime = response['roundTime'];
 
         document.getElementById("question").classList.remove("hidden");
         document.getElementById("answers").classList.remove("hidden");
@@ -88,6 +109,10 @@ socket.onmessage = async (event) => {
         document.getElementById("actions").classList.add("hidden");
         document.getElementById("player-list").classList.add("hidden");
         document.getElementById("start-btn").classList.add("hidden");
+        document.getElementById("logo-img").classList.add("hidden");
+
+
+        document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
 
         let questionElem = document.getElementById("question-text");
         questionElem.textContent = question;
@@ -96,25 +121,41 @@ socket.onmessage = async (event) => {
             let answer = answers[i];
             let answerElem = document.getElementById("answer-" + (i+1));
             answerElem.textContent = answer;
+            answerElem.classList.remove("disabled");
+            answerElem.classList.remove("selected");
         }
 
-        startTimer(10000);
+        startTimer(questionTime);
+    } else if (response['message'] == "GAME OVER"){
+        console.log(response);
+        let playerDetails = response['playerDetails'];
+
+        localStorage.setItem("playerDetails", playerDetails);
+
+        window.location = "/home/results";
     }
 };
 
-function createGame() {
+async function createGame() {
     let numQuestions = document.getElementById("number-of-questions").value;
     let numRounds = document.getElementById("number-of-rounds").value;
     let time = document.getElementById("time-per-questions").value;
-
+    let user = await fetchPlayer();
     socket.send(JSON.stringify({
         questionsPerRound: numQuestions,
         numberOfRounds: numRounds,
         roundLength: time*1000,
+        player: user['user'],
         requestType: "CREATE"
     }));
 
     document.getElementById("game-options").classList.add("hidden");
+}
+
+function showWaitingScreen() {
+    document.getElementById('join-code-header').textContent = "Waiting for game to start...";
+    document.getElementById('join-code').innerHTML = "";
+    document.getElementById('actions').innerHTML = "";
 }
 
 /**
@@ -131,25 +172,23 @@ function startGame() {
     );
 }
 
-function joinGame() {
+async function joinGame() {
     gameID = getGameIdFromInputs();
-
-    document.getElementById('join-code-header').textContent = "Waiting for game to start...";
-    document.getElementById('join-code').innerHTML = "";
-    document.getElementById('actions').innerHTML = "";
-
+    let user = await fetchPlayer();
     socket.send(JSON.stringify({
         gameID: gameID,
+        player: user['user'],
         requestType: "JOIN"
     }));
 }
 
-function sendAnswer() {
-    answer = document.getElementById("answerbox").value;
+async function sendAnswer(answer) {
+    let user = await fetchPlayer();
     socket.send(JSON.stringify({
         answer: answer,
         requestType: "ANSWER",
-        gameID: gameID
+        gameID: gameID,
+        player: user['user']
     }));
 }
 
@@ -167,6 +206,7 @@ function createJoinCodeForm(givenCode){
         input.id = `digit-${i}`;
         input.name = `digit-${i}`;
         input.className = "singleInput";
+        input.maxLength = 1;
 
         if(i < 5){
             input.setAttribute('data-next', `digit-${i+1}`);
@@ -225,7 +265,10 @@ function createJoinCodeForm(givenCode){
             } else if((event.keyCode >= 65 && event.keyCode <= 90) || (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || event.keyCode === 39){
                 if(next != null){
                     let nextInput = document.getElementById(next);
-                    nextInput.focus();
+                    if(input.value != ""){
+                        nextInput.focus();
+                    }
+                    
                 }
             }
 
@@ -308,3 +351,56 @@ function showGameOptions(){
 }
 
 document.getElementById("create-game").addEventListener("click", createGame);
+
+for(let i = 0; i < 4; i++){
+    let btn = document.getElementById(`answer-${i+1}`);
+    btn.addEventListener("click", (event) => {
+        let allBtns = document.getElementsByClassName("answer-btn");
+        Array.from(allBtns).forEach(btn2 => {
+            if(btn != btn2){
+                btn2.classList.add("disabled");
+                btn2.classList.remove("selected");
+            } else {
+                btn2.classList.remove("disabled");
+                btn2.classList.add("selected");
+            }
+        });
+
+        console.log(event.currentTarget.textContent);
+        sendAnswer(event.currentTarget.textContent);
+    });
+}
+
+
+
+function test(event){
+    let next = event.target.getAttribute('data-next');
+            let previous = event.target.getAttribute('data-previous');
+
+            if(event.keyCode === 8 || event.keyCode === 37){
+                if(previous != null){
+                    let previousInput = document.getElementById(previous);
+                    previousInput.focus();
+                }
+            } else if((event.keyCode >= 65 && event.keyCode <= 90) || (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || event.keyCode === 39){
+                if(next != null){
+                    let nextInput = document.getElementById(next);
+                    if(input.value != ""){
+                        nextInput.focus();
+                    }
+                    
+                }
+            }
+
+            let isValid = Array.from(inputs).every(input => { return input.value != ""; });
+
+            if(isValid){
+                document.getElementById('digit-group').classList.add('valid');
+                document.getElementById("join-btn").disabled = false;
+                document.getElementById("join-btn").classList.remove('disabled');
+            } else {
+                document.getElementById('digit-group').classList.remove('valid');
+                document.getElementById("join-btn").disabled = true;
+                document.getElementById("join-btn").classList.add('disabled');
+            }
+}
