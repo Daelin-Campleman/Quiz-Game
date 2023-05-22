@@ -2,13 +2,14 @@ import { getQuestions } from "./questions.js";
 import {saveGameLeaderBoard} from "../db/leaderboardRepository.js"
 import { createGameRequest } from "../db/requests.js";
 
-function Player(ws, name, id, score, currentAnswer) {
+function Player(ws, name, id, isHost) {
   this.ws = ws;
   this.name = name;
   this.id = id;
-  this.score = score;
-  this.currentAnswer = currentAnswer;
-  this.answerHistory = []
+  this.score = 0;
+  this.currentAnswer = "";
+  this.answerHistory = [];
+  this.isHost = isHost;
 }
 
 async function fetchName() {
@@ -40,7 +41,7 @@ export async function createGame(startingPlayer, gameOptions) {
   getQuestions(gameOptions).then(async (quesitions) => {
     let game = {
       gameId: gameId,
-      players: [new Player(startingPlayer, user['name'], user['id'], 0, "")],
+      players: [new Player(startingPlayer, user['name'], user['id'], true)],
       questionsPerRound: gameOptions.questionsPerRound || 5,
       numberOfRounds: gameOptions.numberOfRounds || 3,
       currentRound: 1,
@@ -98,7 +99,7 @@ export function joinGame(socket, gameOptions) {
     socket.send(JSON.stringify({
       requestType: "JOIN",
       success: false,
-      message: "Game does not exist.ecniweiuc"
+      message: "Game does not exist"
     }))
   } else if (game.started) {
     socket.send(JSON.stringify({
@@ -111,7 +112,7 @@ export function joinGame(socket, gameOptions) {
     if (player !== undefined && process.env.NODE_ENV != 'development') {
       socket.send("Player already in game"); //TODO maybe handle a rejoining player
     } else {
-      game.players.push(new Player(socket, user['name'], user['id'], 0, ""));
+      game.players.push(new Player(socket, user['name'], user['id'], false));
       game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
       socket.send(JSON.stringify({
         success: true, 
@@ -197,9 +198,7 @@ export function questionOver(joinCode) {
   }
 }
 
-function roundOver(joinCode) {
-  //TODO: maybe send something saying that the round is over?
-  //TODO: Fetch new questions for next round, otherwise questions repeat
+export function roundOver(joinCode) {
   const game = liveGames.get(joinCode);
   clearInterval(game.intervalID);
   game.currentQuestion = 1;
@@ -207,14 +206,22 @@ function roundOver(joinCode) {
   if (game.currentRound > game.numberOfRounds) {
     endGame(joinCode);
   } else {
-    //Delay each round by 5s
-    setTimeout(() => {
-      sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode, game.currentQuestion, game.currentRound, game.roundTime);
-      game.intervalID = setInterval(() => {
-        questionOver(joinCode);
-      }, game.roundTime);
-    }, 5000);
+    const players = game.players;
+    players.forEach(p => {
+      p.ws.send(JSON.stringify({
+        "message": "ROUND OVER",
+        "isHost": p.isHost
+      }));
+    })
   }
+}
+
+export function nextRound(joinCode) {
+  const game = liveGames.get(joinCode);
+    sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode, game.currentQuestion, game.currentRound, game.roundTime);
+    game.intervalID = setInterval(() => {
+      questionOver(joinCode);
+    }, game.roundTime);
 }
 
 function endGame(joinCode) {
