@@ -270,7 +270,8 @@ section.grid {
     margin-bottom: 1em;
 }
 
-.btn:hover, .btn.selected {
+.btn:hover,
+.btn.selected {
     animation: ani 8s linear infinite;
     border: none;
     cursor: pointer;
@@ -300,7 +301,8 @@ section.grid {
     transition: 1s;
 }
 
-.btn:hover::before, .btn.selected::before {
+.btn:hover::before,
+.btn.selected::before {
     filter: blur(20px);
 }
 
@@ -507,7 +509,7 @@ footer {
 
 /* @media for mobile */
 @media screen and (max-width: 768px) {
-    #answers > button {
+    #answers>button {
         width: 100%;
         min-height: 3em;
         line-height: 1em;

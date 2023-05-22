@@ -6,10 +6,11 @@ window.onload = function() {
 
 const res = [
     { name: "Bob Stone", points: 15 },
-    { name: "John Wick", points: 20 },
+    { name: "John Wickernoodle", points: 20 },
     { name: "John B", points: 5 },
-    { name: "Logan Wick", points: 10 },
-    { name: "Bob John", points: 5 },
+    { name: "Logan Wickernoodle", points: 10 },
+    { name: "Bobby pins", points: 5 },
+    { name: "Chris P bacon", points: 30 },
 ]
 
 function loadLeaderBoard(items) {
