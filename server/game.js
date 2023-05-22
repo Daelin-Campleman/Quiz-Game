@@ -30,10 +30,15 @@ const liveGames = new Map();
  */
 export async function createGame(startingPlayer, gameOptions) {
   const getRandomCode = () => Math.random().toString(36).slice(2, 7).toUpperCase();
-  const data = await createGameRequest(joinCode);
+
+  const joinCode = getRandomCode();
+  const gameId = await createGameRequest(joinCode)[0];
+
   let user = gameOptions['player'];
+
   getQuestions(gameOptions).then(async (quesitions) => {
     let game = {
+      gameId: gameId,
       players: [new Player(startingPlayer, user['name'], user['id'], 0, "")],
       questionsPerRound: gameOptions.questionsPerRound || 5,
       numberOfRounds: gameOptions.numberOfRounds || 3,
@@ -47,7 +52,7 @@ export async function createGame(startingPlayer, gameOptions) {
     liveGames.set(joinCode, game);
     // We might want to send PlayerID here for further communication
     startingPlayer.send(JSON.stringify({
-      gameID: gameID,
+      joinCode: joinCode,
       message: `joined game with player id: ${user['id']}`
     }));
   });
@@ -63,7 +68,7 @@ export async function createGame(startingPlayer, gameOptions) {
  * Receives answer for player and stores in player object in game object in liveGames
  */
 export function clientAnswer(client, options) {
-  const game = liveGames.get(options['gameID']);
+  const game = liveGames.get(options['joinCode']);
   const answer = options['answer'];
   const user = options['player'];
   const player = game.players.find(p => p.id === user['id'])
@@ -85,9 +90,9 @@ export function clientAnswer(client, options) {
  */
 
 export function joinGame(socket, gameOptions) {
-  let gameID = gameOptions['gameID'];
+  let joinCode = gameOptions['joinCode'];
   let user = gameOptions['player'];
-  const game = liveGames.get(gameID);
+  const game = liveGames.get(joinCode);
   if (game === undefined) {
     socket.send(JSON.stringify({
       requestType: "JOIN",
@@ -124,8 +129,8 @@ export function joinGame(socket, gameOptions) {
  * *
  * Sends a question to a all clients in game
  */
-function sendQuestions(question, gameID, quesitonNumber, roundNumber, roundTime) {
-  const game = liveGames.get(gameID);
+function sendQuestions(question, joinCode, quesitonNumber, roundNumber, roundTime) {
+  const game = liveGames.get(joinCode);
   if (game != undefined) {
     const players = game.players;
     players.forEach(p => {
@@ -160,11 +165,11 @@ function shuffleArray(array) {
  * *
  * Starts gameloop
  */
-export function startGame(gameID) {
-  const game = liveGames.get(gameID);
-  sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID, game.currentQuestion, game.currentRound, game.roundTime);
+export function startGame(joinCode) {
+  const game = liveGames.get(joinCode);
+  sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode, game.currentQuestion, game.currentRound, game.roundTime);
   game.intervalID = setInterval(() => {
-    questionOver(gameID);
+    questionOver(joinCode);
   }, game.roundTime);
 }
 
@@ -187,7 +192,7 @@ export function questionOver(joinCode) {
   if (game.currentQuestion > game.questionsPerRound) {
     roundOver(joinCode);
   } else {
-    sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID, game.currentQuestion, game.currentRound, game.roundTime);
+    sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode, game.currentQuestion, game.currentRound, game.roundTime);
   }
 }
 
@@ -203,9 +208,9 @@ function roundOver(joinCode) {
   } else {
     //Delay each round by 5s
     setTimeout(() => {
-      sendQuestions(game.questions[calculateQuestionNumber(gameID)], gameID, game.currentQuestion, game.currentRound, game.roundTime);
+      sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode, game.currentQuestion, game.currentRound, game.roundTime);
       game.intervalID = setInterval(() => {
-        questionOver(gameID);
+        questionOver(joinCode);
       }, game.roundTime);
     }, 5000);
   }

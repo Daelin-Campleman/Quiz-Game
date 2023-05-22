@@ -56,7 +56,7 @@ function parseMessage(msg, ws) {
       clientAnswer(ws, msg);
       break;
     case "START":
-      startGame(msg['gameID']);
+      startGame(msg['joinCode']);
       break;
     default:
       return;
