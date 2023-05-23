@@ -40,16 +40,28 @@ li i {
     padding-bottom: 20px;
 }
 
-ul .loaded-first {
+ul .loaded-gold {
     height: 60%;
 }
 
-ul .loaded-second {
+ul .loaded-gold>i {
+    color: #ffd700;
+}
+
+ul .loaded-silver {
     height: 40%;
 }
 
-ul .loaded-third {
+ul .loaded-silver>i {
+    color: #c0c0c0;
+}
+
+ul .loaded-bronze {
     height: 30%;
+}
+
+ul .loaded-bronze>i {
+    color: #967444;
 }
 
 hr {
@@ -68,24 +80,25 @@ table {
     background-color: #eeeeee;
     box-shadow: 0px 5px 15px 8px #c5c5c5;
     padding: 40px;
+    border-radius: 10px;
 }
 
 th {
     height: 50px;
 }
 
-tr {
+#results tr {
     transition: all 0.2s ease-in-out;
-    border-radius: 0.2rem;
+    border-radius: 10px;
 }
 
-tr:not(:first-child):hover {
+#results tr:hover {
     background-color: #fff;
     transform: scale(1.1);
     box-shadow: 0px 5px 15px 8px #c5c5c5;
 }
 
-tr:nth-child(odd) {
+#results tr:nth-child(odd) {
     background-color: #f9f9f9;
 }
 
