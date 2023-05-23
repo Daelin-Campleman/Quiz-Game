@@ -43,7 +43,7 @@ socket.onmessage = async (event) => {
     console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
 
-    if (response['joinCode'] != undefined) {
+    if (response['joinCode'] != undefined && response['isHost'] == undefined) {
         joinCode = response['joinCode'];
 
         document.getElementById('join-code').innerHTML = "";
@@ -126,6 +126,33 @@ socket.onmessage = async (event) => {
         }
 
         startTimer(questionTime);
+    } else if (response['message'] == "ROUND OVER"){
+        let isHost = response['isHost'];
+        
+        if(isHost){
+            document.getElementById("question").classList.add("hidden");
+            document.getElementById("answers").classList.add("hidden");
+            document.getElementById("join-code-header").classList.remove("hidden");
+            document.getElementById("actions").classList.remove("hidden");
+            document.getElementById("questionRound").textContent = "";
+
+            document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+
+            // create start round button and append to #actions
+            let startRound = document.createElement('button');
+            startRound.textContent = "Start Round";
+            startRound.classList.add("btn");
+            document.getElementById('actions').appendChild(startRound);
+            startRound.onclick = nextRound(response["joinCode"]);
+        } else {
+            document.getElementById("question").classList.add("hidden");
+            document.getElementById("answers").classList.add("hidden");
+            document.getElementById("join-code-header").classList.remove("hidden");
+            document.getElementById("actions").classList.remove("hidden");
+            document.getElementById("questionRound").textContent = "";
+    
+            document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+        }
     } else if (response['message'] == "GAME OVER"){
         console.log(response);
         let playerDetails = response['playerDetails'];
@@ -150,6 +177,13 @@ async function createGame() {
     }));
 
     document.getElementById("game-options").classList.add("hidden");
+}
+
+function nextRound(joinCode) {
+    socket.send(JSON.stringify({
+        requestType: "NEXT ROUND",
+        joinCode: joinCode,
+    }));
 }
 
 function showWaitingScreen() {
