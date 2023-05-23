@@ -137,13 +137,16 @@ socket.onmessage = async (event) => {
             document.getElementById("questionRound").textContent = "";
 
             document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+            document.getElementById("actions").innerHTML = "";
 
             // create start round button and append to #actions
             let startRound = document.createElement('button');
             startRound.textContent = "Start Round";
             startRound.classList.add("btn");
             document.getElementById('actions').appendChild(startRound);
-            startRound.onclick = nextRound(response["joinCode"]);
+            startRound.onclick = () => {
+                nextRound(response["joinCode"]);
+            };
         } else {
             document.getElementById("question").classList.add("hidden");
             document.getElementById("answers").classList.add("hidden");
