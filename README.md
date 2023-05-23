@@ -1,6 +1,4 @@
-# Quiz Game
-
-Feel free to add to this or change whatever, this is just what I had in my head when I came up with this idea 😋
+# Quiz Game :pencil2:
 
 | Links |
 |-|
@@ -26,7 +24,17 @@ The application will use it's own API in order to communicate with the database.
 
 ## Requirements
 
-- Create requirements list...
+- Html, CSS, and JS only.
+- Multiple pages
+- Enough scope to flex your new muscles
+- No front end framework
+- Node.JS for the back
+- Relational DB of choice
+- Express is allowed but, you should be able to tell us why you needed express or any other library.
+- Your web application and backend have to be deployed live at a secure web-address(HTTPS).
+- Your web-application will make use of APIs (both an API you built as well as an API you did not build – 3rd party)
+- Your database will be deployed and secured live.
+- NO localhost allowed! 
 
 ## Other headings...
 
