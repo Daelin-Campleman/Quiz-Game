@@ -5,6 +5,6 @@ IF NOT EXISTS(
 )
 CREATE TABLE users (
     users_id INTEGER PRIMARY KEY,
-    username VARCHAR(15) UNIQUE NOT NULL,
+    username VARCHAR(15) NOT NULL,
     name VARCHAR(MAX) NOT NULL
 );

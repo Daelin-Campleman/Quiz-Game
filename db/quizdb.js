@@ -57,10 +57,10 @@ export const execSQLRequest = (sql) =>
 
     request.on('row', columns => {
 
-      let record = [];
+      let record = new Map();
 
       columns.forEach(column => {
-        record.push(column.value);
+        record.set(column.metadata.colName, column.value);
     });
 
     result.push(record);

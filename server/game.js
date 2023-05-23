@@ -33,7 +33,7 @@ export async function createGame(startingPlayer, gameOptions) {
 
   const joinCode = getRandomCode();
   let result = await createGameRequest(joinCode);
-  let gameId = result[0][0];
+  let gameId = result[0].get("game_id");
 
   let user = gameOptions['player'];
 

@@ -12,12 +12,12 @@ export const userDBVerification = async (issuer, profile, cb) => {
 
         if (response.length == 0) {
             response = await insertUserRequest(profile.displayName);
-            userId = response[0][0];
+            userId = response[0].get("user_id");
 
             await insertFederatedCredentialsRequest(userId, issuer, profile.id);
         }
         else {
-            userId = response[0][0];
+            userId = response[0].get("user_id");
         }
 
         const user = {
