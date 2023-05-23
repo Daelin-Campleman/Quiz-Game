@@ -110,6 +110,7 @@ socket.onmessage = async (event) => {
         document.getElementById("player-list").classList.add("hidden");
         document.getElementById("start-btn").classList.add("hidden");
         document.getElementById("logo-img").classList.add("hidden");
+        document.getElementById("loader").classList.add("hidden");
 
 
         document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
@@ -139,6 +140,9 @@ socket.onmessage = async (event) => {
             document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
             document.getElementById("actions").innerHTML = "";
 
+
+            document.getElementById("logo-img").classList.remove("hidden");
+
             // create start round button and append to #actions
             let startRound = document.createElement('button');
             startRound.textContent = "Start Round";
@@ -153,6 +157,7 @@ socket.onmessage = async (event) => {
             document.getElementById("join-code-header").classList.remove("hidden");
             document.getElementById("actions").classList.remove("hidden");
             document.getElementById("questionRound").textContent = "";
+            document.getElementById("loader").classList.remove("hidden");
     
             document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
         }
@@ -194,6 +199,8 @@ function showWaitingScreen() {
     document.getElementById('join-code-header').textContent = "Waiting for game to start...";
     document.getElementById('join-code').innerHTML = "";
     document.getElementById('actions').innerHTML = "";
+    document.getElementById("loader").classList.remove("hidden");
+    document.getElementById("logo-img").classList.remove("hidden");
 }
 
 /**
