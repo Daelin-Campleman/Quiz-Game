@@ -1,5 +1,6 @@
 import passport from "passport";
-import {getGameLeaderboard, getTable} from "../db/leaderboardRepository.js"
+import { getGameLeaderboardRequest, getTableRequest } from "../db/requests.js";
+
 import path from "path";
 import { fileURLToPath } from 'url';
 
@@ -11,8 +12,8 @@ import { Router } from "express";
 const gameRouter = Router()
 
 gameRouter.get("/leaderboard", async (req, res) => {
-    let joinCode = req.query.joinCode;
-    getGameLeaderboard(joinCode).then((leaderboard) => {
+    let gameId = req.query.gameId;
+    getGameLeaderboardRequest(gameId).then((leaderboard) => {
         res.send(JSON.stringify({
             leaderboard: leaderboard
         }))
@@ -23,8 +24,7 @@ gameRouter.get("/leaderboard", async (req, res) => {
 });
   
 gameRouter.get("/leaderboard/all", async (req, res) => {
-    let joinCode = req.query.joinCode;
-    getTable().then((table) => {
+    getTableRequest().then((table) => {
         res.send(JSON.stringify({
             table: table
         }))
