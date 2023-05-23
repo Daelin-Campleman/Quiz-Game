@@ -254,10 +254,5 @@ function calculateQuestionNumber(joinCode, gameId) { //might be better to random
 async function sendToDB(joinCode, gameId) {
   const game = liveGames.get(joinCode);
   const players = game.players;
-  // let playersSql = "";
-  // players.forEach(p => {
-  //   playersSql += `(\'${gameId}\', \'${p.id}\', ${p.score}),`
-  // });
-  // playersSql = playersSql.slice(0, -1);
   await saveGameLeaderBoardRequest(gameId, players);
 }

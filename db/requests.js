@@ -32,7 +32,7 @@ export function saveGameLeaderBoardRequest(gameId, players) {
         values += `(${gameId}, ${player.id}, ${player.score}),`;
     });
 
-    value = value.substring(0, value.length - 1);
+    values = values.substring(0, values.length - 1);
 
     let sql = `
         INSERT INTO game_score(
@@ -40,9 +40,7 @@ export function saveGameLeaderBoardRequest(gameId, players) {
             users_id,
             score
         )
-        VALUES (
-            ${values}
-        );
+        VALUES ${values};
     `;
 
     return execSQLRequest(sql);

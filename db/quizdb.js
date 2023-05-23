@@ -5,11 +5,11 @@ config();
 
 const dbConfig = JSON.parse(process.env.DATABASE_CONFIG);
 
-let connection = new Connection(dbConfig);
+//let connection = new Connection(dbConfig);
 
 function checkConnection() {
   if (connection.state.name == 'Final') {
-    connection = new Connection(dbConfig);
+    //connection = new Connection(dbConfig);
   }
 }
 
@@ -39,9 +39,11 @@ export function createRequestT(sql) {
 
 export const execSQLRequest = (sql) =>  
   new Promise((resolve, reject) => {
-    checkConnection();
+    //checkConnection();
+    const connection = new Connection(dbConfig);
 
     let result = [];
+    console.log(sql);
 
     const request = new Request(sql, (err, rowCount) => {
       if (err) {
@@ -63,7 +65,7 @@ export const execSQLRequest = (sql) =>
         record.set(column.metadata.colName, column.value);
     });
 
-    result.push(record);
+    if (record.size > 0) result.push(record);
 
   });
   
