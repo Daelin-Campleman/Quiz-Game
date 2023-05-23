@@ -164,9 +164,9 @@ socket.onmessage = async (event) => {
 };
 
 async function createGame() {
-    let numQuestions = document.getElementById("number-of-questions").value;
-    let numRounds = document.getElementById("number-of-rounds").value;
-    let time = document.getElementById("time-per-questions").value;
+    let numQuestions = Number(document.getElementById("number-of-questions").value);
+    let numRounds = Number(document.getElementById("number-of-rounds").value);
+    let time = Number(document.getElementById("time-per-questions").value);
     let user = await fetchPlayer();
     socket.send(JSON.stringify({
         questionsPerRound: numQuestions,
@@ -180,6 +180,7 @@ async function createGame() {
 }
 
 function nextRound(joinCode) {
+    console.log('Sending next round')
     socket.send(JSON.stringify({
         requestType: "NEXT ROUND",
         joinCode: joinCode,
