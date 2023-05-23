@@ -24,16 +24,33 @@ export function getGameLeaderboardRequest(gameID) {
     return  execSQLRequest(sql);
 }
 
-export async function saveGameLeaderBoardRequest(players, callback) {
-    let sql = `INSERT INTO game_score(game_id, users_id, score) VALUES ${players}`;
+export function saveGameLeaderBoardRequest(gameId, players) {
+
+    let values = "";
+
+    players.forEach(player => {
+        values += `(${gameId}, ${player.id}, ${player.score}),`;
+    });
+
+    value = value.substring(0, value.length - 1);
+
+    let sql = `
+        INSERT INTO game_score(
+            game_id,
+            users_id,
+            score
+        )
+        VALUES (
+            ${values}
+        );
+    `;
 
     return execSQLRequest(sql);
-    
 }
 
 export function getTableRequest() {
     let sql = `SELECT * FROM game_score`;
-    
+
     return execSQLRequest(sql);
 }
 
