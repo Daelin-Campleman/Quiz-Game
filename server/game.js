@@ -259,5 +259,5 @@ async function sendToDB(joinCode, gameId) {
     playersSql += `(\'${gameId}\', \'${p.id}\', ${p.score}),`
   });
   playersSql = playersSql.slice(0, -1);
-  saveGameLeaderBoardRequest(playersSql).catch((err) => console.log(err));
+  await saveGameLeaderBoardRequest(playersSql).catch((err) => console.log(err));
 }
