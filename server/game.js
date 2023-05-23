@@ -210,7 +210,8 @@ export function roundOver(joinCode) {
     players.forEach(p => {
       p.ws.send(JSON.stringify({
         "message": "ROUND OVER",
-        "isHost": p.isHost
+        "isHost": p.isHost,
+        "joinCode": joinCode
       }));
     })
   }

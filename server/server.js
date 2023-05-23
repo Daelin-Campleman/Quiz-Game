@@ -1,5 +1,5 @@
 import { WebSocketServer } from "ws"; 
-import { createGame, joinGame, startGame, clientAnswer, roundOver } from "./game.js";
+import { createGame, joinGame, startGame, clientAnswer, nextRound } from "./game.js";
 import http from "http";
 import debug from "debug";
 import { config } from "dotenv";
@@ -59,7 +59,7 @@ function parseMessage(msg, ws) {
       startGame(msg['joinCode']);
       break;
     case "NEXT ROUND":
-      roundOver(msg['joinCode'])
+      nextRound(msg['joinCode'])
     default:
       return;
   }
