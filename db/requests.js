@@ -50,3 +50,58 @@ export function getTableRequest() {
 function buildRequest(query, callback) {
     return new Request(query, callback);
 }
+
+export function selectFederatedCredentialsByIdRequest(provider, subject) {
+    const sql = `
+        SELECT [user_id]
+        FROM [dbo].[federated_credentials]
+        WHERE [provider] = '${provider}' and [subject] = '${subject}';
+    `;
+
+    return execSQLRequest(sql);
+}
+
+export function insertUserRequest(name){
+    const sql = `
+        INSERT INTO [dbo].[Users] (
+            [username],
+            [name]
+        ) 
+        OUTPUT inserted.[users_id]
+        VALUES (
+            'N/A',
+            '${name}'
+        );
+    `;
+
+    return execSQLRequest(sql);
+}
+
+export function insertFederatedCredentialsRequest(userId, provider, subject){
+    const sql = `
+        INSERT INTO [dbo].[federated_credentials] (
+            [user_id],
+            [provider],
+            [subject]
+        )
+        OUTPUT inserted.[federated_credentials_id]
+        VALUES (
+            '${userId}',
+            '${provider}',
+            '${subject}'
+        );
+    `;
+
+    return execSQLRequest(sql);
+}
+export function getUserById(userId){
+    const sql = `
+        SELECT
+        [users_id],
+        [username],
+        [name]
+        FROM [dbo].[Users];
+    `;
+
+    return execSQLRequest(sql);
+}

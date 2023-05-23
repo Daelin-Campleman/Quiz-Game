@@ -48,7 +48,7 @@ export const execSQLRequest = (sql) =>
         console.log(err);
       } else {
         //console.log("rowCount:",rowCount);
-        if (result == "" || result == null || result == "null") result = "[]";
+        //if (result == "" || result == null || result == "null") result = "[]";
         //console.log("result:",result);
         resolve(result);
       }
