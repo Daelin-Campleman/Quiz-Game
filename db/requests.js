@@ -53,10 +53,6 @@ export function getTableRequest() {
     return execSQLRequest(sql);
 }
 
-function buildRequest(query, callback) {
-    return new Request(query, callback);
-}
-
 export function selectFederatedCredentialsByIdRequest(provider, subject) {
     const sql = `
         SELECT [user_id]

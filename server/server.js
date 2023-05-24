@@ -4,8 +4,9 @@ import http from "http";
 import debug from "debug";
 import { config } from "dotenv";
 import app from "../app.js";
-import { getGameLeaderboardRequest } from "../db/requests.js";
 
+
+// Fetching env variables
 config();
 
 const DEBUG = debug("dev");
@@ -69,21 +70,3 @@ function parseMessage(msg, ws) {
 wss.on("connection", (ws) => {
   ws.on("message", (msg) => parseMessage(JSON.parse(msg), ws));
 });
-
-/*
-
-  game = {
-    players = [players],
-    maxQuestions = int,
-    currentQuestion = int,
-    numAnswers = int,
-    questions = [question objects]
-    intervalID: number
-  }
-
-  player = {
-    socket,
-    uuid,
-    score
-  }
-*/
