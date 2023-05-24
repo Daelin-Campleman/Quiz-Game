@@ -1,6 +1,5 @@
 import { getQuestions } from "./questions.js";
-import {saveGameLeaderBoard} from "../db/leaderboardRepository.js"
-import { createGameRequest } from "../db/requests.js";
+import { createGameRequest, saveGameLeaderBoardRequest } from "../db/requests.js";
 
 function Player(ws, name, id, isHost) {
   this.ws = ws;
@@ -34,7 +33,7 @@ export async function createGame(startingPlayer, gameOptions) {
 
   const joinCode = getRandomCode();
   let result = await createGameRequest(joinCode);
-  let gameId = result[0][0];
+  let gameId = result[0].get("game_id");
 
   let user = gameOptions['player'];
 
@@ -240,25 +239,21 @@ function endGame(joinCode) {
     p.ws.send(JSON.stringify({
       "message": "GAME OVER",
       "score": p.score,
-      "playerDetails": playerDetails
+      "playerDetails": playerDetails,
+      "gameId": game.gameId
     }))
   });
-  sendToDB(joinCode);
+  sendToDB(joinCode, game.gameId);
   liveGames.delete(joinCode);
 }
 
-function calculateQuestionNumber(joinCode) { //might be better to randomly sample list of questions and just make sure it can't repeat
+function calculateQuestionNumber(joinCode, gameId) { //might be better to randomly sample list of questions and just make sure it can't repeat
   const game = liveGames.get(joinCode);
   return (game.currentRound - 1) * game.questionsPerRound + game.currentQuestion - 1;
 }
 
-async function sendToDB(joinCode) {
+async function sendToDB(joinCode, gameId) {
   const game = liveGames.get(joinCode);
   const players = game.players;
-  let playersSql = "";
-  players.forEach(p => {
-    playersSql += `(\'${joinCode}\', \'${p.ws.id}\', ${p.score}),`
-  });
-  playersSql = playersSql.slice(0, -1);
-  saveGameLeaderBoard(playersSql).catch((err) => console.log(err));
+  await saveGameLeaderBoardRequest(gameId, players);
 }

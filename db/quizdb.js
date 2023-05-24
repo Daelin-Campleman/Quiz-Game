@@ -5,11 +5,11 @@ config();
 
 const dbConfig = JSON.parse(process.env.DATABASE_CONFIG);
 
-let connection = new Connection(dbConfig);
+//let connection = new Connection(dbConfig);
 
 function checkConnection() {
   if (connection.state.name == 'Final') {
-    connection = new Connection(dbConfig);
+    //connection = new Connection(dbConfig);
   }
 }
 
@@ -39,16 +39,18 @@ export function createRequestT(sql) {
 
 export const execSQLRequest = (sql) =>  
   new Promise((resolve, reject) => {
-    checkConnection();
+    //checkConnection();
+    const connection = new Connection(dbConfig);
 
     let result = [];
+    console.log(sql);
 
     const request = new Request(sql, (err, rowCount) => {
       if (err) {
         console.log(err);
       } else {
         //console.log("rowCount:",rowCount);
-        if (result == "" || result == null || result == "null") result = "[]";
+        //if (result == "" || result == null || result == "null") result = "[]";
         //console.log("result:",result);
         resolve(result);
       }
@@ -57,13 +59,13 @@ export const execSQLRequest = (sql) =>
 
     request.on('row', columns => {
 
-      let record = [];
+      let record = new Map();
 
       columns.forEach(column => {
-        record.push(column.value);
+        record.set(column.metadata.colName, column.value);
     });
 
-    result.push(record);
+    if (record.size > 0) result.push(record);
 
   });
   

@@ -167,7 +167,7 @@ socket.onmessage = async (event) => {
 
         localStorage.setItem("playerDetails", playerDetails);
 
-        window.location = "/home/results";
+        window.location = "/home/leaderboard.html?gameId=" + response['gameId'];
     }
 };
 
