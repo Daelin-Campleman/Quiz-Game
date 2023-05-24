@@ -5,14 +5,6 @@ config();
 
 const dbConfig = JSON.parse(process.env.DATABASE_CONFIG);
 
-//let connection = new Connection(dbConfig);
-
-function checkConnection() {
-  if (connection.state.name == 'Final') {
-    //connection = new Connection(dbConfig);
-  }
-}
-
 export function createRequestT(sql) {
   const request = new Request(sql, (err, rowCount) => {
     if (err) {
@@ -39,7 +31,6 @@ export function createRequestT(sql) {
 
 export const execSQLRequest = (sql) =>  
   new Promise((resolve, reject) => {
-    //checkConnection();
     const connection = new Connection(dbConfig);
 
     let result = [];
@@ -49,9 +40,6 @@ export const execSQLRequest = (sql) =>
       if (err) {
         console.log(err);
       } else {
-        //console.log("rowCount:",rowCount);
-        //if (result == "" || result == null || result == "null") result = "[]";
-        //console.log("result:",result);
         resolve(result);
       }
       connection.close();
