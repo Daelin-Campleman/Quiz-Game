@@ -1,41 +1,15 @@
-const res = [
-    { name: "Bob Stone", points: 30 },
-    { name: "John Wickernoodle", points: 30 },
-    { name: "John B", points: 5 },
-    { name: "Logan Wickernoodle", points: 10 },
-    { name: "Bobby pins", points: 5 },
-    { name: "Chris P bacon", points: 30 },
-]
-
-async function fetchGame() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const myParam = urlParams.get('gameId');
-
-    console.log(myParam)
-
-    let response = await fetch(`/game/leaderboard?gameId=${myParam}`);
-    // let data = response["leaderboard"];
-    console.log("hello!")
-    // console.log(response);
-    console.log(response.json());
-    // return data.user.name;
-}
-
 function loadLeaderBoard(items) {
-    items.sort((a, b) => b["points"] - a["points"]);
-
     const table = document.getElementById("results");   
-
     let order = 0;
     
     // Loop through
     for (let i = 0; i < items.length; i++) {
-        if (i != 0 && items[i].points != items[i - 1]?.points) {
-            loadPodium(items[i].name, order+1, i + 1);
+        if (i != 0 && items[i].score != items[i - 1]?.score) {
+            loadPodium(items[i].users_id, order+1, i + 1);
             order = i;
         }
         else {
-            loadPodium(items[i].name, order, i + 1);
+            loadPodium(items[i].users_id, order, i + 1);
         }       
         
         let row = table.insertRow();
@@ -47,8 +21,8 @@ function loadLeaderBoard(items) {
         points.className = "points";
         number.className = "number";
         
-        name.innerHTML = items[i].name;
-        points.innerHTML = items[i].points;
+        name.innerHTML = items[i].users_id;
+        points.innerHTML = items[i].score;
         number.innerHTML = order+1;
     }
 }
@@ -77,5 +51,14 @@ function loadPodium(name, result, position) {
     podium.innerHTML += name;
 }
 
-loadLeaderBoard(res);
+async function fetchGame() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const myParam = urlParams.get('gameId');
+
+    let response = await fetch(`/game/leaderboard?gameId=${myParam}`);
+    let data = await response.json();
+
+    loadLeaderBoard(JSON.parse(data.leaderboard))
+}
+
 fetchGame();

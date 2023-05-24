@@ -14,13 +14,17 @@ const gameRouter = Router()
 gameRouter.get("/leaderboard", async (req, res) => {
     let gameId = req.query.gameId;
     getGameLeaderboardRequest(gameId).then((leaderboard) => {
-        // res.send(JSON.stringify({
-        //     leaderboard: leaderboard
-        // }))
-        const json = JSON.stringify(Object.fromEntries(leaderboard));
+        let results = leaderboard.map(score => {
+            return {
+                "users_id" : score.get("users_id"),
+                "score" : score.get("score")
+            }
+        })
+
+        let jsonMap = JSON.stringify(results);
 
         res.status(200).json({
-            leaderboard: json
+            leaderboard: jsonMap
         });
     }).catch((err) => {
         res.status(400);
