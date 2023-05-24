@@ -20,6 +20,7 @@ export function getGameLeaderboardRequest(gameID) {
     INNER JOIN game_score s
     ON u.user_id = s.user_id
     WHERE s.game_id = ${gameID}
+    ORDER BY s.score DESC
     `
 
     return  execSQLRequest(sql);
