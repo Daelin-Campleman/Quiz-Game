@@ -628,7 +628,7 @@ footer {
     }
 
     #digit-group input {
-        width: 14%;
+        width: 6vw;
         height: 70px;
         line-height: 70px;
         font-size: 42px;
