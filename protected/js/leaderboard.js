@@ -14,10 +14,10 @@ async function fetchGame() {
     console.log(myParam)
 
     let response = await fetch(`/game/leaderboard?gameId=${myParam}`);
-    let data = response;
+    // let data = response["leaderboard"];
     console.log("hello!")
-    console.log(data);
-    console.log(data.json());
+    console.log(response);
+    // console.log(data.json());
     // return data.user.name;
 }
 
