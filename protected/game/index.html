@@ -59,20 +59,21 @@
         <input type="number" id="time-per-questions" min="1" max="60" value="20" />
         <label for="question-difficulty">Question Difficulty</label>
         <form>
-            <section>
+            <label class="check-label">
                 <input type="checkbox" id="question-difficulty-easy" value="easy" checked />
-                <label for="question-difficulty-easy">Easy</label>
-            </section>
-            <section>
+                Easy
+            </label>
+
+            <label for="question-difficulty-medium" class="check-label">
                 <input type="checkbox" id="question-difficulty-medium" value="medium" checked />
-                <label for="question-difficulty-medium">Medium</label>
-            </section>
-            <section>
+                Medium
+            </label>
+
+            <label for="question-difficulty-hard" class="check-label">
                 <input type="checkbox" id="question-difficulty-hard" value="hard" checked />
-                <label for="question-difficulty-hard">Hard</label>
-            </section>
+                Hard
+            </label>
         </form>
-        
 
         <button class="btn" id="create-game">Create Game</button>
     </section>
