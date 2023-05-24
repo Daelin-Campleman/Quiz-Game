@@ -140,3 +140,8 @@ td {
         padding: 0;
     }
 }
+
+aside.home-btn {
+    position: absolute;
+    float: inline-start;
+}
