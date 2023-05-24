@@ -52,11 +52,11 @@
     <section id="actions"></section>
     <section id="game-options" class="hidden">
         <label for="number-of-questions">Number of Questions</label>
-        <input type="number" id="number-of-questions" min="1" value="10" />
+        <input type="number" id="number-of-questions" min="1" value="10" onkeypress="return event.charCode >= 48 && event.charCode <= 57" />
         <label for="number-of-rounds">Number of Rounds</label>
-        <input type="number" id="number-of-rounds" min="1" value="5" />
+        <input type="number" id="number-of-rounds" min="1" value="5" onkeypress="return event.charCode >= 48 && event.charCode <= 57" />
         <label for="time-per-questions">Seconds per Question</label>
-        <input type="number" id="time-per-questions" min="1" max="60" value="20" />
+        <input type="number" id="time-per-questions" min="1" max="60" value="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57" />
         <label for="question-difficulty">Question Difficulty</label>
         <form>
             <label class="check-label">
