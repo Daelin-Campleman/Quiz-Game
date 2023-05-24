@@ -24,11 +24,7 @@ socket.onopen = () => {
     let join = urlParams.get('join');
 
     if(create != null && join == null){
-        // TODO: Show game options first
-
         showGameOptions();
-
-        //createGame();
     } else if(create == null && join != null){
         document.getElementById('join-code-header').textContent = "Enter the game pin to join";
 
@@ -36,57 +32,37 @@ socket.onopen = () => {
     } else if(create == null && join == null){
         window.location = "/home";
     }
+
+    document.getElementById("create-game").addEventListener("click", createGame);
+
+    for(let i = 0; i < 4; i++){
+        let btn = document.getElementById(`answer-${i+1}`);
+        btn.addEventListener("click", (event) => {
+            let allBtns = document.getElementsByClassName("answer-btn");
+            Array.from(allBtns).forEach(btn2 => {
+                if(btn != btn2){
+                    btn2.classList.add("disabled");
+                    btn2.classList.remove("selected");
+                } else {
+                    btn2.classList.remove("disabled");
+                    btn2.classList.add("selected");
+                }
+            });
+    
+            console.log(event.currentTarget.textContent);
+            sendAnswer(event.currentTarget.textContent);
+        });
+    }
 }
 
-let playerID = "";
 socket.onmessage = async (event) => {
     console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
 
     if (response['joinCode'] != undefined && response['isHost'] == undefined) {
-        joinCode = response['joinCode'];
-
-        document.getElementById('join-code').innerHTML = "";
-
-        let joinCodeEl = document.createElement('h3');
-        joinCodeEl.textContent = joinCode;
-        let qrCode = document.createElement('img');
-        let link = "";
-        if(window.location.host.includes("-qa")){
-            link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${joinCode}`;
-        } else {
-            link = `http://quizwizzy.co.za/home/game?join=${joinCode}`;
-        }
-        qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
-        document.getElementById('join-code').appendChild(joinCodeEl);
-        document.getElementById('join-code').appendChild(qrCode);
-        document.getElementById('join-code-header').textContent = "Use this code to join this game or scan the QR code";
-
-        createPlayerList();
-
-        let li = document.createElement('li');
-        li.textContent = await fetchName();
-
-        document.getElementById('player-list').appendChild(li);
-
-        let startBtn = document.getElementById("start-btn");
-        startBtn.onclick = startGame;
-        startBtn.classList.remove("hidden");
+        showCreatorWaitingScreen(response);
     } else if (response['message'] == "New Player Joined Game"){
-        //console.log(response);
-
-        document.getElementById('player-list').innerHTML = "";
-        
-        let liHeader = document.createElement('li');
-        liHeader.textContent = "Players";
-        document.getElementById('player-list').appendChild(liHeader);
-
-        for (let i = 0; i < response['players'].length; i++) {
-            // create li and append to ul
-            let li = document.createElement('li');
-            li.textContent = response['players'][i]['name'];
-            document.getElementById('player-list').appendChild(li);
-        }
+        addPlayerToList(response);
     } else if (response['requestType'] === "JOIN") {
         if (response['success']) {
             showWaitingScreen();
@@ -95,72 +71,9 @@ socket.onmessage = async (event) => {
         }
     }
     else if (response['text'] != undefined){
-        document.getElementById("join-code-header").textContent = "";
-        let question = response['text']['text'];
-        let answers = response['options'];
-        let questionNumber = response['questionNumber'];
-        let roundNumber = response['roundNumber'];
-        let questionTime = response['roundTime'];
-
-        document.getElementById("question").classList.remove("hidden");
-        document.getElementById("answers").classList.remove("hidden");
-        document.getElementById("join-code-header").classList.add("hidden");
-        document.getElementById("join-code").classList.add("hidden");
-        document.getElementById("actions").classList.add("hidden");
-        document.getElementById("player-list").classList.add("hidden");
-        document.getElementById("start-btn").classList.add("hidden");
-        document.getElementById("logo-img").classList.add("hidden");
-        document.getElementById("loader").classList.add("hidden");
-
-
-        document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
-
-        let questionElem = document.getElementById("question-text");
-        questionElem.textContent = question;
-
-        for(let i = 0; i < 4; i++){
-            let answer = answers[i];
-            let answerElem = document.getElementById("answer-" + (i+1));
-            answerElem.textContent = answer;
-            answerElem.classList.remove("disabled");
-            answerElem.classList.remove("selected");
-        }
-
-        startTimer(questionTime);
+        showNewQuestion(response);
     } else if (response['message'] == "ROUND OVER"){
-        let isHost = response['isHost'];
-        
-        if(isHost){
-            document.getElementById("question").classList.add("hidden");
-            document.getElementById("answers").classList.add("hidden");
-            document.getElementById("join-code-header").classList.remove("hidden");
-            document.getElementById("actions").classList.remove("hidden");
-            document.getElementById("questionRound").textContent = "";
-
-            document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
-            document.getElementById("actions").innerHTML = "";
-
-
-            document.getElementById("logo-img").classList.remove("hidden");
-
-            // create start round button and append to #actions
-            let startRound = document.createElement('button');
-            startRound.textContent = "Start Round";
-            startRound.classList.add("btn");
-            document.getElementById('actions').appendChild(startRound);
-            startRound.onclick = () => {
-                nextRound(response["joinCode"]);
-            };
-        } else {
-            document.getElementById("question").classList.add("hidden");
-            document.getElementById("answers").classList.add("hidden");
-            document.getElementById("join-code-header").classList.remove("hidden");
-            document.getElementById("actions").classList.remove("hidden");
-            document.getElementById("questionRound").textContent = "";
-            document.getElementById("loader").classList.remove("hidden");
-    
-            document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
-        }
+        roundOver(response);
     } else if (response['message'] == "GAME OVER"){
         console.log(response);
         let playerDetails = response['playerDetails'];
@@ -170,6 +83,123 @@ socket.onmessage = async (event) => {
         window.location = "/home/leaderboard.html?gameId=" + response['gameId'];
     }
 };
+
+async function showCreatorWaitingScreen(response){
+    joinCode = response['joinCode'];
+
+    document.getElementById('join-code').innerHTML = "";
+
+    let joinCodeEl = document.createElement('h3');
+    joinCodeEl.textContent = joinCode;
+    let qrCode = document.createElement('img');
+    let link = "";
+    if(window.location.host.includes("-qa")){
+        link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${joinCode}`;
+    } else {
+        link = `http://quizwizzy.co.za/home/game?join=${joinCode}`;
+    }
+    qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
+    document.getElementById('join-code').appendChild(joinCodeEl);
+    document.getElementById('join-code').appendChild(qrCode);
+    document.getElementById('join-code-header').textContent = "Use this code to join this game or scan the QR code";
+
+    createPlayerList();
+
+    let li = document.createElement('li');
+    li.textContent = await fetchName();
+
+    document.getElementById('player-list').appendChild(li);
+
+    let startBtn = document.getElementById("start-btn");
+    startBtn.onclick = startGame;
+    startBtn.classList.remove("hidden");
+}
+
+function addPlayerToList(response){
+    document.getElementById('player-list').innerHTML = "";
+        
+    let liHeader = document.createElement('li');
+    liHeader.textContent = "Players";
+    document.getElementById('player-list').appendChild(liHeader);
+
+    for (let i = 0; i < response['players'].length; i++) {
+        // create li and append to ul
+        let li = document.createElement('li');
+        li.textContent = response['players'][i]['name'];
+        document.getElementById('player-list').appendChild(li);
+    }
+}
+
+function showNewQuestion(response){
+    document.getElementById("join-code-header").textContent = "";
+    let question = response['text']['text'];
+    let answers = response['options'];
+    let questionNumber = response['questionNumber'];
+    let roundNumber = response['roundNumber'];
+    let questionTime = response['roundTime'];
+
+    document.getElementById("question").classList.remove("hidden");
+    document.getElementById("answers").classList.remove("hidden");
+    document.getElementById("join-code-header").classList.add("hidden");
+    document.getElementById("join-code").classList.add("hidden");
+    document.getElementById("actions").classList.add("hidden");
+    document.getElementById("player-list").classList.add("hidden");
+    document.getElementById("start-btn").classList.add("hidden");
+    document.getElementById("logo-img").classList.add("hidden");
+    document.getElementById("loader").classList.add("hidden");
+
+
+    document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
+
+    let questionElem = document.getElementById("question-text");
+    questionElem.textContent = question;
+
+    for(let i = 0; i < 4; i++){
+        let answer = answers[i];
+        let answerElem = document.getElementById("answer-" + (i+1));
+        answerElem.textContent = answer;
+        answerElem.classList.remove("disabled");
+        answerElem.classList.remove("selected");
+    }
+
+    startTimer(questionTime);
+}
+
+function roundOver(response){
+    let isHost = response['isHost'];
+        
+    if(isHost){
+        document.getElementById("question").classList.add("hidden");
+        document.getElementById("answers").classList.add("hidden");
+        document.getElementById("join-code-header").classList.remove("hidden");
+        document.getElementById("actions").classList.remove("hidden");
+        document.getElementById("questionRound").textContent = "";
+
+        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+        document.getElementById("actions").innerHTML = "";
+
+
+        document.getElementById("logo-img").classList.remove("hidden");
+
+        // create start round button and append to #actions
+        let startRound = document.createElement('button');
+        startRound.textContent = "Start Round";
+        startRound.classList.add("btn");
+        document.getElementById('actions').appendChild(startRound);
+        startRound.onclick = () => {
+            nextRound(response["joinCode"]);
+        };
+    } else {
+        document.getElementById("question").classList.add("hidden");
+        document.getElementById("answers").classList.add("hidden");
+        document.getElementById("join-code-header").classList.remove("hidden");
+        document.getElementById("actions").classList.remove("hidden");
+        document.getElementById("questionRound").textContent = "";
+        document.getElementById("loader").classList.remove("hidden");
+
+        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+    }
+}
 
 async function createGame() {
     let numQuestions = Number(document.getElementById("number-of-questions").value);
@@ -218,10 +248,6 @@ function showWaitingScreen() {
     document.getElementById("logo-img").classList.remove("hidden");
 }
 
-/**
- * Simple POC of broadcasting messages to stored live games
- * Can be used to send new questions etc.
- */
 function startGame() {
     console.log(`joinCode: ${joinCode}`)
     socket.send(
@@ -301,8 +327,6 @@ function createJoinCodeForm(givenCode){
         joinButton.classList.add('disabled');
         joinButton.disabled = true;
     }
-
-    
 
     document.getElementById('actions').appendChild(joinButton);
 
@@ -408,59 +432,4 @@ function startTimer(time){
 function showGameOptions(){
     let place = document.getElementById("game-options");
     place.classList.remove("hidden");
-}
-
-document.getElementById("create-game").addEventListener("click", createGame);
-
-for(let i = 0; i < 4; i++){
-    let btn = document.getElementById(`answer-${i+1}`);
-    btn.addEventListener("click", (event) => {
-        let allBtns = document.getElementsByClassName("answer-btn");
-        Array.from(allBtns).forEach(btn2 => {
-            if(btn != btn2){
-                btn2.classList.add("disabled");
-                btn2.classList.remove("selected");
-            } else {
-                btn2.classList.remove("disabled");
-                btn2.classList.add("selected");
-            }
-        });
-
-        console.log(event.currentTarget.textContent);
-        sendAnswer(event.currentTarget.textContent);
-    });
-}
-
-
-
-function test(event){
-    let next = event.target.getAttribute('data-next');
-            let previous = event.target.getAttribute('data-previous');
-
-            if(event.keyCode === 8 || event.keyCode === 37){
-                if(previous != null){
-                    let previousInput = document.getElementById(previous);
-                    previousInput.focus();
-                }
-            } else if((event.keyCode >= 65 && event.keyCode <= 90) || (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || event.keyCode === 39){
-                if(next != null){
-                    let nextInput = document.getElementById(next);
-                    if(input.value != ""){
-                        nextInput.focus();
-                    }
-                    
-                }
-            }
-
-            let isValid = Array.from(inputs).every(input => { return input.value != ""; });
-
-            if(isValid){
-                document.getElementById('digit-group').classList.add('valid');
-                document.getElementById("join-btn").disabled = false;
-                document.getElementById("join-btn").classList.remove('disabled');
-            } else {
-                document.getElementById('digit-group').classList.remove('valid');
-                document.getElementById("join-btn").disabled = true;
-                document.getElementById("join-btn").classList.add('disabled');
-            }
 }
