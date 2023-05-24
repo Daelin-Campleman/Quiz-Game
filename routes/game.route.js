@@ -16,7 +16,7 @@ gameRouter.get("/leaderboard", async (req, res) => {
     getGameLeaderboardRequest(gameId).then((leaderboard) => {
         let results = leaderboard.map(score => {
             return {
-                "users_id" : score.get("users_id"),
+                "name" : score.get("name"),
                 "score" : score.get("score")
             }
         })

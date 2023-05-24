@@ -5,11 +5,11 @@ function loadLeaderBoard(items) {
     // Loop through
     for (let i = 0; i < items.length; i++) {
         if (i != 0 && items[i].score != items[i - 1]?.score) {
-            loadPodium(items[i].users_id, order+1, i + 1);
+            loadPodium(items[i].name, order+1, i + 1);
             order = i;
         }
         else {
-            loadPodium(items[i].users_id, order, i + 1);
+            loadPodium(items[i].name, order, i + 1);
         }       
         
         let row = table.insertRow();
@@ -21,7 +21,7 @@ function loadLeaderBoard(items) {
         points.className = "points";
         number.className = "number";
         
-        name.innerHTML = items[i].users_id;
+        name.innerHTML = items[i].name;
         points.innerHTML = items[i].score;
         number.innerHTML = order+1;
     }
