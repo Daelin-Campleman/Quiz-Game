@@ -56,33 +56,57 @@ socket.onopen = () => {
 }
 
 socket.onmessage = async (event) => {
+    console.log(event);
     console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
 
-    if (response['joinCode'] != undefined && response['isHost'] == undefined) {
-        showCreatorWaitingScreen(response);
-    } else if (response['message'] == "New Player Joined Game"){
-        addPlayerToList(response);
-    } else if (response['requestType'] === "JOIN") {
-        if (response['success']) {
-            showWaitingScreen();
-        } else {
-            alert(response['message']);
-        }
-    }
-    else if (response['text'] != undefined){
-        showNewQuestion(response);
-    } else if (response['message'] == "ROUND OVER"){
-        roundOver(response);
-    } else if (response['message'] == "GAME OVER"){
-        console.log(response);
-        let playerDetails = response['playerDetails'];
-
-        localStorage.setItem("playerDetails", playerDetails);
-
-        window.location = "/home/leaderboard.html?gameId=" + response['gameId'];
+    switch(response['requestType']) {
+        case "JOIN":
+            handleJoin(response);
+            break;
+        case "QUESTION":
+            handleQuestion(response);
+            break;
+        case "ROUND OVER":
+            handleRoundOver(response);
+            break;
+        case "GAME OVER":
+            handleGameOver(response);
+            break;
+        default:
+            return;
     }
 };
+
+function handleJoin(msg) {
+    if (msg['isHost']) {
+        showCreatorWaitingScreen(msg);
+        if (msg['newPlayer']) {
+            addPlayerToList(msg);
+        }
+    } else {
+        console.log('other player')
+        if (msg['success']) {
+            showWaitingScreen();
+        } else {
+            alert(msg['message']);
+        }
+    }
+}
+
+function handleQuestion(msg) {
+    showNewQuestion(msg);
+}
+
+function handleRoundOver(msg) {
+    roundOver(msg);
+}
+
+function handleGameOver(msg) {
+    let playerDetails = msg['playerDetails'];
+    localStorage.setItem("playerDetails", playerDetails);
+    window.location = "/home/leaderboard.html?gameId=" + msg['gameId'];
+}
 
 async function showCreatorWaitingScreen(response){
     joinCode = response['joinCode'];
@@ -132,8 +156,8 @@ function addPlayerToList(response){
 
 function showNewQuestion(response){
     document.getElementById("join-code-header").textContent = "";
-    let question = response['text']['text'];
-    let answers = response['options'];
+    let question = response['questionText']['text'];
+    let answers = response['questionOptions'];
     let questionNumber = response['questionNumber'];
     let roundNumber = response['roundNumber'];
     let questionTime = response['roundTime'];

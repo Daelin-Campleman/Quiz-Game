@@ -34,6 +34,7 @@ export async function createGame(startingPlayer, gameOptions) {
   getQuestions(gameOptions).then(async (quesitions) => {
     let game = {
       gameId: gameId,
+      joinCode: joinCode,
       players: [new Player(startingPlayer, user['name'], user['id'], true)],
       questionsPerRound: gameOptions.questionsPerRound || 5,
       numberOfRounds: gameOptions.numberOfRounds || 3,
@@ -46,6 +47,8 @@ export async function createGame(startingPlayer, gameOptions) {
     };
     liveGames.set(joinCode, game);
     startingPlayer.send(JSON.stringify({
+      requestType: "JOIN",
+      "isHost": true,
       joinCode: joinCode,
       message: `joined game with player id: ${user['id']}`
     }));
@@ -91,25 +94,36 @@ export function joinGame(socket, gameOptions) {
     socket.send(JSON.stringify({
       requestType: "JOIN",
       success: false,
-      message: "Game does not exist"
+      message: "Game does not exist."
     }))
   } else if (game.started) {
     socket.send(JSON.stringify({
-      message: "Game has already started.",
-      success: false,
-      requestType: "JOIN"
+      requestType: "JOIN",
+      requestType: "Game has already started.",
+      success: false
     }));
   } else {
     const player = game.players.find(p => p.id === user['id']);
     if (player !== undefined && process.env.NODE_ENV != 'development') {
-      socket.send("Player already in game"); //TODO maybe handle a rejoining player
+      socket.send(JSON.stringify({
+        requestType: "JOIN",
+        message: "Player already in game",
+        success: false
+      }));
     } else {
       game.players.push(new Player(socket, user['name'], user['id'], false));
-      game.players[0].ws.send(JSON.stringify({...game, success: true, message: "New Player Joined Game"}));
+      game.players[0].ws.send(JSON.stringify({
+        requestType: "JOIN",
+        ...game, 
+        success: true,
+        isHost: true,
+        newPlayer: true
+      }));
       socket.send(JSON.stringify({
+        requestType: "JOIN",
         success: true, 
         message: `Successfully Joined Game with player id: ${user['id']}`, 
-        requestType: "JOIN"}));
+      }));
       console.log(liveGames);
     }
   }
@@ -123,17 +137,20 @@ export function joinGame(socket, gameOptions) {
  * *
  * Sends a question to a all clients in game
  */
-function sendQuestions(question, joinCode, quesitonNumber, roundNumber, roundTime) {
+function sendQuestions(question, joinCode, questionNumber, roundNumber, roundTime) {
   const game = liveGames.get(joinCode);
   if (game != undefined) {
     const players = game.players;
     players.forEach(p => {
       p.ws.send(JSON.stringify({
-        "text": question.question,
-        "options": shuffleArray([...question.incorrectAnswers, question.correctAnswer]),
-        questionNumber: quesitonNumber,
-        roundNumber: roundNumber,
-        roundTime, roundTime
+        "requestType": "QUESTION",
+        "questionText": question.question,
+        "questionOptions": shuffleArray([...question.incorrectAnswers, question.correctAnswer]),
+        "questionNumber": questionNumber,
+        "roundNumber": roundNumber,
+        "roundTime": roundTime,
+        "gameId": game.gameId,
+        "joinCode": game.joinCode
       }));
     })
   }
@@ -214,9 +231,10 @@ export function roundOver(joinCode) {
     const players = game.players;
     players.forEach(p => {
       p.ws.send(JSON.stringify({
-        "message": "ROUND OVER",
+        "requestType": "ROUND OVER",
         "isHost": p.isHost,
-        "joinCode": joinCode
+        "joinCode": joinCode,
+        "gameId": game.gameId
       }));
     })
   }
@@ -251,7 +269,7 @@ function endGame(joinCode) {
   });
   players.forEach(p => {
     p.ws.send(JSON.stringify({
-      "message": "GAME OVER",
+      "requestType": "GAME OVER",
       "score": p.score,
       "playerDetails": playerDetails,
       "gameId": game.gameId
