@@ -239,7 +239,8 @@ function endGame(joinCode) {
     p.ws.send(JSON.stringify({
       "message": "GAME OVER",
       "score": p.score,
-      "playerDetails": playerDetails
+      "playerDetails": playerDetails,
+      "gameId": game.gameId
     }))
   });
   sendToDB(joinCode, game.gameId);

@@ -8,7 +8,12 @@ const res = [
 ]
 
 async function fetchGame() {
-    let response = await fetch("/game/leaderboard");
+    const urlParams = new URLSearchParams(window.location.search);
+    const myParam = urlParams.get('gameId');
+
+    console.log(myParam)
+
+    let response = await fetch(`/game/leaderboard?gameId=${myParam}`);
     let data = response;
     console.log("hello!")
     console.log(data);
