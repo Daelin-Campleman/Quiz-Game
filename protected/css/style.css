@@ -474,8 +474,7 @@ footer {
     justify-content: center;
 }
 
-#game-options input:not([type="checkbox"]),
-#game-options select {
+#game-options input:not([type="checkbox"]) {
     margin-bottom: 1em;
     width: 60%;
     height: 2em;
@@ -490,8 +489,7 @@ footer {
     border: solid 2px #9a2065;
 }
 
-#game-options input:focus,
-#game-options select:focus {
+#game-options input:focus {
     outline: 2px solid #9a2065;
 }
 
@@ -502,7 +500,7 @@ footer {
     text-align: center;
 }
 
-#game-options > section {
+#game-options form {
     margin-bottom: 1em;
     width: 60%;
     height: 2em;
