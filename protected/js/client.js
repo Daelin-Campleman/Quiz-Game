@@ -55,7 +55,7 @@ socket.onmessage = async (event) => {
         if(window.location.host.includes("-qa")){
             link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${joinCode}`;
         } else {
-            link = `http://quiz.stuffs.co.za/home/game?join=${joinCode}`;
+            link = `http://quizwizzy.co.za/home/game?join=${joinCode}`;
         }
         qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
         document.getElementById('join-code').appendChild(joinCodeEl);
