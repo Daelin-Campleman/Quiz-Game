@@ -11,12 +11,6 @@ function Player(ws, name, id, isHost) {
   this.isHost = isHost;
 }
 
-async function fetchName() {
-  let response = await fetch("/auth/user");
-  let data = await response.json();
-  return data.user.name;
-}
-
 // Stores current games in memory
 const liveGames = new Map();
 
@@ -51,7 +45,6 @@ export async function createGame(startingPlayer, gameOptions) {
       roundTime: gameOptions.roundLength || 5000
     };
     liveGames.set(joinCode, game);
-    // We might want to send PlayerID here for further communication
     startingPlayer.send(JSON.stringify({
       joinCode: joinCode,
       message: `joined game with player id: ${user['id']}`
@@ -174,7 +167,13 @@ export function startGame(joinCode) {
   }, game.roundTime);
 }
 
-//Triggers every question interval
+/**
+ * 
+ * @param {string} joinCode
+ * 
+ * *
+ * Triggers every question interval and sends question to players in a game 
+ */
 export function questionOver(joinCode) {
   const game = liveGames.get(joinCode);
   console.log(`round: ${game.currentRound}, question: ${game.currentQuestion}`)
@@ -197,6 +196,13 @@ export function questionOver(joinCode) {
   }
 }
 
+/**
+ * 
+ * @param {string} joinCode
+ * 
+ * *
+ * Ends round, queues next round start 
+ */
 export function roundOver(joinCode) {
   const game = liveGames.get(joinCode);
   clearInterval(game.intervalID);
@@ -224,6 +230,14 @@ export function nextRound(joinCode) {
     }, game.roundTime);
 }
 
+
+/**
+ * 
+ * @param {string} joinCode
+ * 
+ * *
+ * Ends the game and returns scores
+ */
 function endGame(joinCode) {
   const game = liveGames.get(joinCode);
   clearInterval(game.intervalID);
@@ -247,11 +261,19 @@ function endGame(joinCode) {
   liveGames.delete(joinCode);
 }
 
-function calculateQuestionNumber(joinCode, gameId) { //might be better to randomly sample list of questions and just make sure it can't repeat
+function calculateQuestionNumber(joinCode, gameId) {
   const game = liveGames.get(joinCode);
   return (game.currentRound - 1) * game.questionsPerRound + game.currentQuestion - 1;
 }
 
+/**
+ * 
+ * @param {string} joinCode 
+ * @param {string} gameId
+ * 
+ * *
+ * Saves game in DB for leaderboard access 
+ */
 async function sendToDB(joinCode, gameId) {
   const game = liveGames.get(joinCode);
   const players = game.players;
