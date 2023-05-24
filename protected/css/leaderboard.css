@@ -1,0 +1,150 @@
+.container {
+    align-items: center;
+}
+
+/* Podium */
+ul {
+    list-style: none;
+    height: 40vh;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    padding: 0 5% 0 5%;
+    margin: 0;
+    gap: 1%;
+    align-content: space-between;
+    align-self: center;
+}
+
+li {
+    padding: 0.4em;
+    flex: 1;
+    display: flex;
+    overflow-wrap: break-word;
+    width: 14vw;
+
+    flex-direction: column;
+    background-color: rgba(56, 0, 54, 0.3);
+    border-radius: 10px 10px 0 0;
+    height: 20%;
+
+    transition: all 2s ease-in-out;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+li i {
+    font-size: 2rem;
+    margin-top: -1.4em;
+    padding-bottom: 20px;
+    color: rgba(56, 0, 54, 0.3);
+}
+
+ul .loaded-gold {
+    height: 60%;
+    background-color: #ffd700;
+}
+
+ul .loaded-gold>i {
+    color: #ffd700;
+}
+
+ul .loaded-silver {
+    height: 40%;
+    background-color: #c0c0c0;
+}
+
+ul .loaded-silver>i {
+    color: #c0c0c0;
+}
+
+ul .loaded-bronze {
+    height: 30%;
+    background-color: #967444;
+}
+
+ul .loaded-bronze>i {
+    color: #967444;
+}
+
+hr {
+    margin: 0;
+    color: #380036;
+}
+
+/* Leaderboard */
+table {
+    margin: 0 auto 100px auto;
+    padding-bottom: 100px;
+
+    width: 50%;
+    border-collapse: collapse;
+    cursor: default;
+    background-color: #eeeeee;
+    box-shadow: 0px 5px 15px 8px #c5c5c5;
+    padding: 40px;
+    border-radius: 10px;
+}
+
+th {
+    height: 50px;
+}
+
+#results tr {
+    transition: all 0.2s ease-in-out;
+    border-radius: 10px;
+}
+
+#results tr:hover {
+    background-color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0px 5px 15px 8px #c5c5c5;
+}
+
+#results tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+td {
+    height: 5rem;
+    font-size: 1.4rem;
+    padding: 1rem 2rem;
+    position: relative;
+}
+
+.number {
+    font-size: 1.2rem;
+    padding-right: 0;
+    margin: 0;
+    text-align: right;
+    width: 5%;
+}
+
+.name {
+    font-weight: bold;
+    text-align: left;
+    width: 55%;
+}
+
+.points {
+    font-weight: bold;
+    font-size: 1.3rem;
+    width: 40%;
+}
+
+@media (max-width: 740px) {
+    /* * {
+        font-size: 70%;
+    } */
+
+    table {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+aside.home-btn {
+    padding-bottom: 3vh;
+}

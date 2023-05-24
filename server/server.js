@@ -1,12 +1,13 @@
 import { WebSocketServer } from "ws"; 
-import { createGame, joinGame, startGame, clientAnswer } from "./game.js";
+import { createGame, joinGame, startGame, clientAnswer, nextRound } from "./game.js";
 import http from "http";
 import debug from "debug";
 import { config } from "dotenv";
 import app from "../app.js";
 
-config();
 
+// Fetching env variables
+config();
 
 const DEBUG = debug("dev");
 const PORT = process.env.PORT || 5000;
@@ -56,8 +57,10 @@ function parseMessage(msg, ws) {
       clientAnswer(ws, msg);
       break;
     case "START":
-      startGame(msg['gameID']);
+      startGame(msg['joinCode']);
       break;
+    case "NEXT ROUND":
+      nextRound(msg['joinCode'])
     default:
       return;
   }
@@ -67,21 +70,3 @@ function parseMessage(msg, ws) {
 wss.on("connection", (ws) => {
   ws.on("message", (msg) => parseMessage(JSON.parse(msg), ws));
 });
-
-/*
-
-  game = {
-    players = [players],
-    maxQuestions = int,
-    currentQuestion = int,
-    numAnswers = int,
-    questions = [question objects]
-    intervalID: number
-  }
-
-  player = {
-    socket,
-    uuid,
-    score
-  }
-*/

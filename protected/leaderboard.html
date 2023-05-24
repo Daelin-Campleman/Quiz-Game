@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard</title>
+    <script src="https://kit.fontawesome.com/f4575d860e.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/leaderboard.css">
+</head>
+
+<body class="container">
+
+
+
+    <header>
+        <img src="./images/logo.svg" alt="logo">
+    </header>
+
+    <main>
+
+        <h1>Times Up!</h1>
+        <h2>Winners</h2>
+
+
+        <ul>
+            <li id="podium2">
+                <i class="fa-solid fa-trophy"></i>
+            </li>
+            <li id="podium1">
+                <i class="fa-solid fa-trophy fa-bounce"></i>
+            </li>
+            <li id="podium3">
+                <i class="fa-solid fa-trophy"></i>
+            </li>
+        </ul>
+        <hr>
+
+        <aside class="home-btn">
+            <button class="btn" onclick="goTo('/')">Home</button>
+        </aside>
+
+        <h2>Leaderboard</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2">Player</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+
+            <tbody id="results"></tbody>
+        </table>
+
+    </main>
+
+    <script>
+        function goTo(url) {
+            window.location = url;
+        }
+    </script>
+
+    <script src="./js/leaderboard.js"></script>
+</body>
+
+</html>

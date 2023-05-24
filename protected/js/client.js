@@ -2,7 +2,7 @@ const wsURL = window.location.host.includes("localhost") ? `ws://${window.locati
 const socket = new WebSocket(wsURL);
 
 let timer;
-let gameID = "";
+let joinCode = "";
 
 async function fetchName() {
     let response = await fetch("/auth/user");
@@ -24,69 +24,45 @@ socket.onopen = () => {
     let join = urlParams.get('join');
 
     if(create != null && join == null){
-        // TODO: Show game options first
-
         showGameOptions();
-
-        //createGame();
     } else if(create == null && join != null){
         document.getElementById('join-code-header').textContent = "Enter the game pin to join";
 
         createJoinCodeForm(join);
     } else if(create == null && join == null){
-        window.location = "/home";
+        window.location = "/";
+    }
+
+    document.getElementById("create-game").addEventListener("click", createGame);
+
+    for(let i = 0; i < 4; i++){
+        let btn = document.getElementById(`answer-${i+1}`);
+        btn.addEventListener("click", (event) => {
+            let allBtns = document.getElementsByClassName("answer-btn");
+            Array.from(allBtns).forEach(btn2 => {
+                if(btn != btn2){
+                    btn2.classList.add("disabled");
+                    btn2.classList.remove("selected");
+                } else {
+                    btn2.classList.remove("disabled");
+                    btn2.classList.add("selected");
+                }
+            });
+    
+            console.log(event.currentTarget.textContent);
+            sendAnswer(event.currentTarget.textContent);
+        });
     }
 }
 
-let playerID = "";
 socket.onmessage = async (event) => {
     console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
 
-    if (response['gameID'] != undefined) {
-        gameID = response['gameID'];
-
-        document.getElementById('join-code').innerHTML = "";
-
-        let joinCode = document.createElement('h3');
-        joinCode.textContent = gameID;
-        let qrCode = document.createElement('img');
-        let link = "";
-        if(window.location.host.includes("-qa")){
-            link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${gameID}`;
-        } else {
-            link = `http://quiz.stuffs.co.za/home/game?join=${gameID}`;
-        }
-        qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
-        document.getElementById('join-code').appendChild(joinCode);
-        document.getElementById('join-code').appendChild(qrCode);
-        document.getElementById('join-code-header').textContent = "Use this code to join this game or scan the QR code";
-
-        createPlayerList();
-
-        let li = document.createElement('li');
-        li.textContent = await fetchName();
-
-        document.getElementById('player-list').appendChild(li);
-
-        let startBtn = document.getElementById("start-btn");
-        startBtn.onclick = startGame;
-        startBtn.classList.remove("hidden");
+    if (response['joinCode'] != undefined && response['isHost'] == undefined) {
+        showCreatorWaitingScreen(response);
     } else if (response['message'] == "New Player Joined Game"){
-        //console.log(response);
-
-        document.getElementById('player-list').innerHTML = "";
-        
-        let liHeader = document.createElement('li');
-        liHeader.textContent = "Players";
-        document.getElementById('player-list').appendChild(liHeader);
-
-        for (let i = 0; i < response['players'].length; i++) {
-            // create li and append to ul
-            let li = document.createElement('li');
-            li.textContent = response['players'][i]['name'];
-            document.getElementById('player-list').appendChild(li);
-        }
+        addPlayerToList(response);
     } else if (response['requestType'] === "JOIN") {
         if (response['success']) {
             showWaitingScreen();
@@ -95,56 +71,160 @@ socket.onmessage = async (event) => {
         }
     }
     else if (response['text'] != undefined){
-        document.getElementById("join-code-header").textContent = "";
-        let question = response['text']['text'];
-        let answers = response['options'];
-        let questionNumber = response['questionNumber'];
-        let roundNumber = response['roundNumber'];
-        let questionTime = response['roundTime'];
-
-        document.getElementById("question").classList.remove("hidden");
-        document.getElementById("answers").classList.remove("hidden");
-        document.getElementById("join-code-header").classList.add("hidden");
-        document.getElementById("join-code").classList.add("hidden");
-        document.getElementById("actions").classList.add("hidden");
-        document.getElementById("player-list").classList.add("hidden");
-        document.getElementById("start-btn").classList.add("hidden");
-        document.getElementById("logo-img").classList.add("hidden");
-
-
-        document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
-
-        let questionElem = document.getElementById("question-text");
-        questionElem.textContent = question;
-
-        for(let i = 0; i < 4; i++){
-            let answer = answers[i];
-            let answerElem = document.getElementById("answer-" + (i+1));
-            answerElem.textContent = answer;
-            answerElem.classList.remove("disabled");
-            answerElem.classList.remove("selected");
-        }
-
-        startTimer(questionTime);
+        showNewQuestion(response);
+    } else if (response['message'] == "ROUND OVER"){
+        roundOver(response);
     } else if (response['message'] == "GAME OVER"){
         console.log(response);
         let playerDetails = response['playerDetails'];
 
         localStorage.setItem("playerDetails", playerDetails);
 
-        window.location = "/home/results";
+        window.location = "/leaderboard.html?gameId=" + response['gameId'];
     }
 };
 
+async function showCreatorWaitingScreen(response){
+    joinCode = response['joinCode'];
+
+    document.getElementById('join-code').innerHTML = "";
+
+    let joinCodeEl = document.createElement('h3');
+    joinCodeEl.textContent = joinCode;
+    let qrCode = document.createElement('img');
+    let link = "";
+    if(window.location.host.includes("-qa")){
+        link = `http://quizwizzyzilla-qa.azurewebsites.net/game?join=${joinCode}`;
+    } else {
+        link = `http://quizwizzy.co.za/game?join=${joinCode}`;
+    }
+    qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
+    document.getElementById('join-code').appendChild(joinCodeEl);
+    document.getElementById('join-code').appendChild(qrCode);
+    document.getElementById('join-code-header').textContent = "Use this code to join this game or scan the QR code";
+
+    createPlayerList();
+
+    let li = document.createElement('li');
+    li.textContent = await fetchName();
+
+    document.getElementById('player-list').appendChild(li);
+
+    let startBtn = document.getElementById("start-btn");
+    startBtn.onclick = startGame;
+    startBtn.classList.remove("hidden");
+}
+
+function addPlayerToList(response){
+    document.getElementById('player-list').innerHTML = "";
+        
+    let liHeader = document.createElement('li');
+    liHeader.textContent = "Players";
+    document.getElementById('player-list').appendChild(liHeader);
+
+    for (let i = 0; i < response['players'].length; i++) {
+        // create li and append to ul
+        let li = document.createElement('li');
+        li.textContent = response['players'][i]['name'];
+        document.getElementById('player-list').appendChild(li);
+    }
+}
+
+function showNewQuestion(response){
+    document.getElementById("join-code-header").textContent = "";
+    let question = response['text']['text'];
+    let answers = response['options'];
+    let questionNumber = response['questionNumber'];
+    let roundNumber = response['roundNumber'];
+    let questionTime = response['roundTime'];
+
+    document.getElementById("question").classList.remove("hidden");
+    document.getElementById("answers").classList.remove("hidden");
+    document.getElementById("join-code-header").classList.add("hidden");
+    document.getElementById("join-code").classList.add("hidden");
+    document.getElementById("actions").classList.add("hidden");
+    document.getElementById("player-list").classList.add("hidden");
+    document.getElementById("start-btn").classList.add("hidden");
+    document.getElementById("logo-img").classList.add("hidden");
+    document.getElementById("loader").classList.add("hidden");
+
+
+    document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
+
+    let questionElem = document.getElementById("question-text");
+    questionElem.textContent = question;
+
+    for(let i = 0; i < 4; i++){
+        let answer = answers[i];
+        let answerElem = document.getElementById("answer-" + (i+1));
+        answerElem.textContent = answer;
+        answerElem.classList.remove("disabled");
+        answerElem.classList.remove("selected");
+    }
+
+    startTimer(questionTime);
+}
+
+function roundOver(response){
+    let isHost = response['isHost'];
+        
+    if(isHost){
+        document.getElementById("question").classList.add("hidden");
+        document.getElementById("answers").classList.add("hidden");
+        document.getElementById("join-code-header").classList.remove("hidden");
+        document.getElementById("actions").classList.remove("hidden");
+        document.getElementById("questionRound").textContent = "";
+
+        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+        document.getElementById("actions").innerHTML = "";
+
+
+        document.getElementById("logo-img").classList.remove("hidden");
+
+        // create start round button and append to #actions
+        let startRound = document.createElement('button');
+        startRound.textContent = "Start Round";
+        startRound.classList.add("btn");
+        document.getElementById('actions').appendChild(startRound);
+        startRound.onclick = () => {
+            nextRound(response["joinCode"]);
+        };
+    } else {
+        document.getElementById("question").classList.add("hidden");
+        document.getElementById("answers").classList.add("hidden");
+        document.getElementById("join-code-header").classList.remove("hidden");
+        document.getElementById("actions").classList.remove("hidden");
+        document.getElementById("questionRound").textContent = "";
+        document.getElementById("loader").classList.remove("hidden");
+
+        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+    }
+}
+
 async function createGame() {
-    let numQuestions = document.getElementById("number-of-questions").value;
-    let numRounds = document.getElementById("number-of-rounds").value;
-    let time = document.getElementById("time-per-questions").value;
+    let numQuestions = Number(document.getElementById("number-of-questions").value);
+    let numRounds = Number(document.getElementById("number-of-rounds").value);
+    let time = Number(document.getElementById("time-per-questions").value);
+    let difficultyEasy = document.getElementById("question-difficulty-easy").checked;
+    let difficultyMedium = document.getElementById("question-difficulty-medium").checked;
+    let difficultyHard = document.getElementById("question-difficulty-hard").checked;
+
+    let difficultyString = difficultyEasy ? "easy," : "";
+    difficultyString += difficultyMedium ? "medium," : "";
+    difficultyString += difficultyHard ? "hard," : "";
+
+    if(difficultyString == ""){
+        difficultyString = "easy,medium,hard";
+    } else {
+        difficultyString = difficultyString.slice(0, -1);
+    }
+
     let user = await fetchPlayer();
     socket.send(JSON.stringify({
         questionsPerRound: numQuestions,
         numberOfRounds: numRounds,
         roundLength: time*1000,
+        difficulties: difficultyString,
         player: user['user'],
         requestType: "CREATE"
     }));
@@ -152,31 +232,37 @@ async function createGame() {
     document.getElementById("game-options").classList.add("hidden");
 }
 
+function nextRound(joinCode) {
+    console.log('Sending next round')
+    socket.send(JSON.stringify({
+        requestType: "NEXT ROUND",
+        joinCode: joinCode,
+    }));
+}
+
 function showWaitingScreen() {
     document.getElementById('join-code-header').textContent = "Waiting for game to start...";
     document.getElementById('join-code').innerHTML = "";
     document.getElementById('actions').innerHTML = "";
+    document.getElementById("loader").classList.remove("hidden");
+    document.getElementById("logo-img").classList.remove("hidden");
 }
 
-/**
- * Simple POC of broadcasting messages to stored live games
- * Can be used to send new questions etc.
- */
 function startGame() {
-    console.log(`gameID: ${gameID}`)
+    console.log(`joinCode: ${joinCode}`)
     socket.send(
         JSON.stringify({
             requestType: "START",
-            gameID: gameID
+            joinCode: joinCode
         })
     );
 }
 
 async function joinGame() {
-    gameID = getGameIdFromInputs();
+    joinCode = getjoinCodeFromInputs();
     let user = await fetchPlayer();
     socket.send(JSON.stringify({
-        gameID: gameID,
+        joinCode: joinCode,
         player: user['user'],
         requestType: "JOIN"
     }));
@@ -187,7 +273,7 @@ async function sendAnswer(answer) {
     socket.send(JSON.stringify({
         answer: answer,
         requestType: "ANSWER",
-        gameID: gameID,
+        joinCode: joinCode,
         player: user['user']
     }));
 }
@@ -242,8 +328,6 @@ function createJoinCodeForm(givenCode){
         joinButton.disabled = true;
     }
 
-    
-
     document.getElementById('actions').appendChild(joinButton);
 
     // add event listener to each input inside the form
@@ -289,18 +373,18 @@ function createJoinCodeForm(givenCode){
     joinButton.addEventListener('click', joinGame);
 }
 
-function getGameIdFromInputs(){
+function getjoinCodeFromInputs(){
     let digitGroup = document.getElementById('digit-group');
 
     let inputs = digitGroup.getElementsByTagName('input');
 
-    let tmpGameId = "";
+    let tmpjoinCode = "";
 
     Array.from(inputs).forEach(input => {
-        tmpGameId += input.value;
+        tmpjoinCode += input.value;
     });
 
-    return tmpGameId.toUpperCase();
+    return tmpjoinCode.toUpperCase();
 }
 
 function createPlayerList(){
@@ -348,59 +432,4 @@ function startTimer(time){
 function showGameOptions(){
     let place = document.getElementById("game-options");
     place.classList.remove("hidden");
-}
-
-document.getElementById("create-game").addEventListener("click", createGame);
-
-for(let i = 0; i < 4; i++){
-    let btn = document.getElementById(`answer-${i+1}`);
-    btn.addEventListener("click", (event) => {
-        let allBtns = document.getElementsByClassName("answer-btn");
-        Array.from(allBtns).forEach(btn2 => {
-            if(btn != btn2){
-                btn2.classList.add("disabled");
-                btn2.classList.remove("selected");
-            } else {
-                btn2.classList.remove("disabled");
-                btn2.classList.add("selected");
-            }
-        });
-
-        console.log(event.currentTarget.textContent);
-        sendAnswer(event.currentTarget.textContent);
-    });
-}
-
-
-
-function test(event){
-    let next = event.target.getAttribute('data-next');
-            let previous = event.target.getAttribute('data-previous');
-
-            if(event.keyCode === 8 || event.keyCode === 37){
-                if(previous != null){
-                    let previousInput = document.getElementById(previous);
-                    previousInput.focus();
-                }
-            } else if((event.keyCode >= 65 && event.keyCode <= 90) || (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || event.keyCode === 39){
-                if(next != null){
-                    let nextInput = document.getElementById(next);
-                    if(input.value != ""){
-                        nextInput.focus();
-                    }
-                    
-                }
-            }
-
-            let isValid = Array.from(inputs).every(input => { return input.value != ""; });
-
-            if(isValid){
-                document.getElementById('digit-group').classList.add('valid');
-                document.getElementById("join-btn").disabled = false;
-                document.getElementById("join-btn").classList.remove('disabled');
-            } else {
-                document.getElementById('digit-group').classList.remove('valid');
-                document.getElementById("join-btn").disabled = true;
-                document.getElementById("join-btn").classList.add('disabled');
-            }
 }
