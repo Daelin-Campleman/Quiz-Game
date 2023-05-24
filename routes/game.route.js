@@ -14,9 +14,14 @@ const gameRouter = Router()
 gameRouter.get("/leaderboard", async (req, res) => {
     let gameId = req.query.gameId;
     getGameLeaderboardRequest(gameId).then((leaderboard) => {
-        res.send(JSON.stringify({
-            leaderboard: leaderboard
-        }))
+        // res.send(JSON.stringify({
+        //     leaderboard: leaderboard
+        // }))
+        const json = JSON.stringify(Object.fromEntries(leaderboard));
+
+        res.status(200).json({
+            leaderboard: json
+        });
     }).catch((err) => {
         res.status(400);
         res.send(err);
