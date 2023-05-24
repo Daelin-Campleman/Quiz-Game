@@ -15,10 +15,11 @@ export function createGameRequest(joinCode, callback) {
 export function getGameLeaderboardRequest(gameID) {
 
     let sql = `
-    SELECT users_id, score
-    FROM dbo.game_score
-    WHERE game_id = ${gameID}
-    ORDER BY score DESC
+    SELECT u.name, s.score
+    FROM users u
+    INNER JOIN game_score s
+    ON u.users_id = s.users_id
+    WHERE s.game_id = ${gameID}
     `
 
     return  execSQLRequest(sql);
