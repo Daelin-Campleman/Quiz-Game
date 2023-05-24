@@ -30,7 +30,7 @@ socket.onopen = () => {
 
         createJoinCodeForm(join);
     } else if(create == null && join == null){
-        window.location = "/home";
+        window.location = "/";
     }
 
     document.getElementById("create-game").addEventListener("click", createGame);
@@ -80,7 +80,7 @@ socket.onmessage = async (event) => {
 
         localStorage.setItem("playerDetails", playerDetails);
 
-        window.location = "/home/leaderboard.html?gameId=" + response['gameId'];
+        window.location = "/leaderboard.html?gameId=" + response['gameId'];
     }
 };
 
@@ -94,9 +94,9 @@ async function showCreatorWaitingScreen(response){
     let qrCode = document.createElement('img');
     let link = "";
     if(window.location.host.includes("-qa")){
-        link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${joinCode}`;
+        link = `http://quizwizzyzilla-qa.azurewebsites.net/game?join=${joinCode}`;
     } else {
-        link = `http://quizwizzy.co.za/home/game?join=${joinCode}`;
+        link = `http://quizwizzy.co.za/game?join=${joinCode}`;
     }
     qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
     document.getElementById('join-code').appendChild(joinCodeEl);
