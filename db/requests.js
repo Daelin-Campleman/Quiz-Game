@@ -16,9 +16,9 @@ export function getGameLeaderboardRequest(gameID) {
 
     let sql = `
     SELECT u.name, s.score
-    FROM users u
+    FROM [user] u
     INNER JOIN game_score s
-    ON u.users_id = s.users_id
+    ON u.user_id = s.user_id
     WHERE s.game_id = ${gameID}
     `
 
@@ -38,7 +38,7 @@ export function saveGameLeaderBoardRequest(gameId, players) {
     let sql = `
         INSERT INTO game_score(
             game_id,
-            users_id,
+            user_id,
             score
         )
         VALUES ${values};
@@ -69,11 +69,11 @@ export function selectFederatedCredentialsByIdRequest(provider, subject) {
 
 export function insertUserRequest(name){
     const sql = `
-        INSERT INTO [dbo].[Users] (
+        INSERT INTO [dbo].[user] (
             [username],
             [name]
         ) 
-        OUTPUT inserted.[users_id]
+        OUTPUT inserted.[user_id]
         VALUES (
             'N/A',
             '${name}'
@@ -92,7 +92,7 @@ export function insertFederatedCredentialsRequest(userId, provider, subject){
         )
         OUTPUT inserted.[federated_credentials_id]
         VALUES (
-            '${userId}',
+            ${userId},
             '${provider}',
             '${subject}'
         );
@@ -103,10 +103,10 @@ export function insertFederatedCredentialsRequest(userId, provider, subject){
 export function getUserById(userId){
     const sql = `
         SELECT
-        [users_id],
+        [user_id],
         [username],
         [name]
-        FROM [dbo].[Users];
+        FROM [dbo].[User];
     `;
 
     return execSQLRequest(sql);
