@@ -110,6 +110,7 @@ socket.onmessage = async (event) => {
         document.getElementById("player-list").classList.add("hidden");
         document.getElementById("start-btn").classList.add("hidden");
         document.getElementById("logo-img").classList.add("hidden");
+        document.getElementById("loader").classList.add("hidden");
 
 
         document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
@@ -139,6 +140,9 @@ socket.onmessage = async (event) => {
             document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
             document.getElementById("actions").innerHTML = "";
 
+
+            document.getElementById("logo-img").classList.remove("hidden");
+
             // create start round button and append to #actions
             let startRound = document.createElement('button');
             startRound.textContent = "Start Round";
@@ -153,6 +157,7 @@ socket.onmessage = async (event) => {
             document.getElementById("join-code-header").classList.remove("hidden");
             document.getElementById("actions").classList.remove("hidden");
             document.getElementById("questionRound").textContent = "";
+            document.getElementById("loader").classList.remove("hidden");
     
             document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
         }
@@ -170,11 +175,26 @@ async function createGame() {
     let numQuestions = Number(document.getElementById("number-of-questions").value);
     let numRounds = Number(document.getElementById("number-of-rounds").value);
     let time = Number(document.getElementById("time-per-questions").value);
+    let difficultyEasy = document.getElementById("question-difficulty-easy").checked;
+    let difficultyMedium = document.getElementById("question-difficulty-medium").checked;
+    let difficultyHard = document.getElementById("question-difficulty-hard").checked;
+
+    let difficultyString = difficultyEasy ? "easy," : "";
+    difficultyString += difficultyMedium ? "medium," : "";
+    difficultyString += difficultyHard ? "hard," : "";
+
+    if(difficultyString == ""){
+        difficultyString = "easy,medium,hard";
+    } else {
+        difficultyString = difficultyString.slice(0, -1);
+    }
+
     let user = await fetchPlayer();
     socket.send(JSON.stringify({
         questionsPerRound: numQuestions,
         numberOfRounds: numRounds,
         roundLength: time*1000,
+        difficulties: difficultyString,
         player: user['user'],
         requestType: "CREATE"
     }));
@@ -194,6 +214,8 @@ function showWaitingScreen() {
     document.getElementById('join-code-header').textContent = "Waiting for game to start...";
     document.getElementById('join-code').innerHTML = "";
     document.getElementById('actions').innerHTML = "";
+    document.getElementById("loader").classList.remove("hidden");
+    document.getElementById("logo-img").classList.remove("hidden");
 }
 
 /**
