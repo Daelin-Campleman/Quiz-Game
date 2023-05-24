@@ -57,6 +57,23 @@
         <input type="number" id="number-of-rounds" min="1" value="5" onkeypress="return event.charCode >= 48 && event.charCode <= 57" />
         <label for="time-per-questions">Seconds per Question</label>
         <input type="number" id="time-per-questions" min="1" max="60" value="20" onkeypress="return event.charCode >= 48 && event.charCode <= 57" />
+        <label for="question-difficulty">Question Difficulty</label>
+        <form>
+            <label class="check-label">
+                <input type="checkbox" id="question-difficulty-easy" value="easy" checked />
+                Easy
+            </label>
+
+            <label class="check-label">
+                <input type="checkbox" id="question-difficulty-medium" value="medium" checked />
+                Medium
+            </label>
+
+            <label class="check-label">
+                <input type="checkbox" id="question-difficulty-hard" value="hard" checked />
+                Hard
+            </label>
+        </form>
 
         <button class="btn" id="create-game">Create Game</button>
     </section>
