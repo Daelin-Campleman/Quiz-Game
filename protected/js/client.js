@@ -95,11 +95,74 @@ function handleJoin(msg) {
 }
 
 function handleQuestion(msg) {
-    showNewQuestion(msg);
+    document.getElementById("join-code-header").textContent = "";
+    let question = response['questionText']['text'];
+    let answers = response['questionOptions'];
+    let questionNumber = response['questionNumber'];
+    let roundNumber = response['roundNumber'];
+    let questionTime = response['roundTime'];
+
+    document.getElementById("question").classList.remove("hidden");
+    document.getElementById("answers").classList.remove("hidden");
+    document.getElementById("join-code-header").classList.add("hidden");
+    document.getElementById("join-code").classList.add("hidden");
+    document.getElementById("actions").classList.add("hidden");
+    document.getElementById("player-list").classList.add("hidden");
+    document.getElementById("start-btn").classList.add("hidden");
+    document.getElementById("logo-img").classList.add("hidden");
+    document.getElementById("loader").classList.add("hidden");
+
+
+    document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
+
+    let questionElem = document.getElementById("question-text");
+    questionElem.textContent = question;
+
+    for(let i = 0; i < 4; i++){
+        let answer = answers[i];
+        let answerElem = document.getElementById("answer-" + (i+1));
+        answerElem.textContent = answer;
+        answerElem.classList.remove("disabled");
+        answerElem.classList.remove("selected");
+    }
+
+    startTimer(questionTime);
 }
 
 function handleRoundOver(msg) {
-    roundOver(msg);
+    let isHost = response['isHost'];
+        
+    if(isHost){
+        document.getElementById("question").classList.add("hidden");
+        document.getElementById("answers").classList.add("hidden");
+        document.getElementById("join-code-header").classList.remove("hidden");
+        document.getElementById("actions").classList.remove("hidden");
+        document.getElementById("questionRound").textContent = "";
+
+        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+        document.getElementById("actions").innerHTML = "";
+
+
+        document.getElementById("logo-img").classList.remove("hidden");
+
+        // create start round button and append to #actions
+        let startRound = document.createElement('button');
+        startRound.textContent = "Start Round";
+        startRound.classList.add("btn");
+        document.getElementById('actions').appendChild(startRound);
+        startRound.onclick = () => {
+            nextRound(response["joinCode"]);
+        };
+    } else {
+        document.getElementById("question").classList.add("hidden");
+        document.getElementById("answers").classList.add("hidden");
+        document.getElementById("join-code-header").classList.remove("hidden");
+        document.getElementById("actions").classList.remove("hidden");
+        document.getElementById("questionRound").textContent = "";
+        document.getElementById("loader").classList.remove("hidden");
+
+        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
+    }
 }
 
 function handleGameOver(msg) {
@@ -151,77 +214,6 @@ function addPlayerToList(response){
         let li = document.createElement('li');
         li.textContent = response['players'][i]['name'];
         document.getElementById('player-list').appendChild(li);
-    }
-}
-
-function showNewQuestion(response){
-    document.getElementById("join-code-header").textContent = "";
-    let question = response['questionText']['text'];
-    let answers = response['questionOptions'];
-    let questionNumber = response['questionNumber'];
-    let roundNumber = response['roundNumber'];
-    let questionTime = response['roundTime'];
-
-    document.getElementById("question").classList.remove("hidden");
-    document.getElementById("answers").classList.remove("hidden");
-    document.getElementById("join-code-header").classList.add("hidden");
-    document.getElementById("join-code").classList.add("hidden");
-    document.getElementById("actions").classList.add("hidden");
-    document.getElementById("player-list").classList.add("hidden");
-    document.getElementById("start-btn").classList.add("hidden");
-    document.getElementById("logo-img").classList.add("hidden");
-    document.getElementById("loader").classList.add("hidden");
-
-
-    document.getElementById("questionRound").textContent = `Question ${questionNumber} - Round ${roundNumber}`;
-
-    let questionElem = document.getElementById("question-text");
-    questionElem.textContent = question;
-
-    for(let i = 0; i < 4; i++){
-        let answer = answers[i];
-        let answerElem = document.getElementById("answer-" + (i+1));
-        answerElem.textContent = answer;
-        answerElem.classList.remove("disabled");
-        answerElem.classList.remove("selected");
-    }
-
-    startTimer(questionTime);
-}
-
-function roundOver(response){
-    let isHost = response['isHost'];
-        
-    if(isHost){
-        document.getElementById("question").classList.add("hidden");
-        document.getElementById("answers").classList.add("hidden");
-        document.getElementById("join-code-header").classList.remove("hidden");
-        document.getElementById("actions").classList.remove("hidden");
-        document.getElementById("questionRound").textContent = "";
-
-        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
-        document.getElementById("actions").innerHTML = "";
-
-
-        document.getElementById("logo-img").classList.remove("hidden");
-
-        // create start round button and append to #actions
-        let startRound = document.createElement('button');
-        startRound.textContent = "Start Round";
-        startRound.classList.add("btn");
-        document.getElementById('actions').appendChild(startRound);
-        startRound.onclick = () => {
-            nextRound(response["joinCode"]);
-        };
-    } else {
-        document.getElementById("question").classList.add("hidden");
-        document.getElementById("answers").classList.add("hidden");
-        document.getElementById("join-code-header").classList.remove("hidden");
-        document.getElementById("actions").classList.remove("hidden");
-        document.getElementById("questionRound").textContent = "";
-        document.getElementById("loader").classList.remove("hidden");
-
-        document.getElementById("join-code-header").textContent = "Waiting for next round to start...";
     }
 }
 
