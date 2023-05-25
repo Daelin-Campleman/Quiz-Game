@@ -5,8 +5,6 @@ import debug from "debug";
 import { config } from "dotenv";
 import app from "../app.js";
 
-
-// Fetching env variables
 config();
 
 const DEBUG = debug("dev");
@@ -16,7 +14,7 @@ const server = http.createServer(app);
 
 process.on("uncaughtException", (error) => {
   DEBUG(`uncaught exception: ${error}`);
-  process.exit(1);
+  //process.exit(1);
 });
 
 process.on("unhandledRejection", (err) => {
@@ -25,7 +23,7 @@ process.on("unhandledRejection", (err) => {
     name: err.name,
     message: err.message || err,
   });
-  process.exit(1);
+  //process.exit(1);
 });
 
 server.listen(PORT, () => {
@@ -45,7 +43,6 @@ const wss = new WebSocketServer({ server: server });
  * See MessagingFormat.md for a breakdown of messaging types
  */
 function parseMessage(msg, ws) {
-  console.log(`Received Message: ${JSON.stringify(msg)}`);
   switch(msg['requestType']) {
     case "CREATE":
       createGame(ws, msg);

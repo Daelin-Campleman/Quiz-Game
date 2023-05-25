@@ -30,7 +30,8 @@ authRouter.get('/login/federated/google', passport.authenticate('google'));
 
 authRouter.get('/oauth2/redirect/google', passport.authenticate('google', {
   successReturnToOrRedirect: '/',
-  failureRedirect: '/auth/login'
+  failureRedirect: '/auth/login',
+  keepSessionInfo: true
 }));
 
 authRouter.get('/user', function(req, res, next) {
@@ -47,10 +48,10 @@ authRouter.get('/user', function(req, res, next) {
   }
 });
 
-authRouter.post('/logout', function(req, res, next) {
+authRouter.get('/logout', function(req, res, next) {
   req.logout(function(err) {
     if (err) { return next(err); }
-    res.redirect('/');
+    res.redirect('/home');
   });
 });
 

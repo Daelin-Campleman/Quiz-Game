@@ -199,7 +199,12 @@ section.grid {
     margin: 1em;
 }
 
-.btn {
+#join-code-header.error {
+    color: red;
+}
+
+.btn,
+.btn-logout {
     text-decoration: none;
     position: relative;
     border: none;
@@ -216,6 +221,11 @@ section.grid {
     border: none;
     z-index: 1;
     margin: 1em;
+}
+
+.btn-logout {
+    background: grey;
+    cursor: pointer;
 }
 
 .btn.disabled {
@@ -539,7 +549,11 @@ footer {
 }
 
 #loader {
-    height: 100vh;
+    position: fixed;
+    top: 50vh;
+    left: 0;
+    height: 50vh;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -615,6 +629,11 @@ footer {
 
 /* @media for mobile */
 @media screen and (max-width: 768px) {
+    header img {
+        width: 40%;
+        height: 20vh;
+    }
+
     #answers>button {
         width: 100%;
         min-height: 3em;
@@ -655,5 +674,9 @@ footer {
 
     #game-options form label {
         margin-left: 25%;
+    }
+
+    .btn.selected {
+        animation: none;
     }
 }
