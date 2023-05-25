@@ -175,6 +175,7 @@ async function showCreatorWaitingScreen(response){
     joinCode = response['joinCode'];
 
     document.getElementById('join-code').innerHTML = "";
+    document.getElementById("join-code").classList.remove("hidden");
 
     let joinCodeEl = document.createElement('h3');
     joinCodeEl.textContent = joinCode;
