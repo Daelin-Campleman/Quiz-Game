@@ -122,6 +122,8 @@ function handleQuestion(msg) {
         answerElem.classList.remove("selected");
     }
 
+    document.activeElement?.blur();
+
     startTimer(questionTime);
 }
 
