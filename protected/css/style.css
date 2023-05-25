@@ -199,6 +199,10 @@ section.grid {
     margin: 1em;
 }
 
+#join-code-header.error {
+    color: red;
+}
+
 .btn {
     text-decoration: none;
     position: relative;

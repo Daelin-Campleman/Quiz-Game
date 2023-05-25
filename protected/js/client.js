@@ -89,7 +89,8 @@ function handleJoin(msg) {
         if (msg['success']) {
             showWaitingScreen();
         } else {
-            alert(msg['message']);
+            document.getElementById("join-code-header").textContent = msg['message'];
+            document.getElementById("join-code-header").classList.add("error")
         }
     }
 }
