@@ -58,7 +58,10 @@ async function fetchGame() {
     let response = await fetch(`/game/leaderboard?gameId=${myParam}`);
     let data = await response.json();
 
-    loadLeaderBoard(JSON.parse(data.leaderboard))
+    if (JSON.parse(data.leaderboard).length) {
+        loadLeaderBoard(JSON.parse(data.leaderboard))
+        clearInterval(fetchGameInterval);
+    }
 }
 
-fetchGame();
+const fetchGameInterval = setInterval(fetchGame, 1000);

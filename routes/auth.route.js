@@ -48,10 +48,10 @@ authRouter.get('/user', function(req, res, next) {
   }
 });
 
-authRouter.post('/logout', function(req, res, next) {
+authRouter.get('/logout', function(req, res, next) {
   req.logout(function(err) {
     if (err) { return next(err); }
-    res.redirect('/');
+    res.redirect('/home');
   });
 });
 

@@ -120,9 +120,8 @@ function handleQuestion(msg) {
         answerElem.textContent = answer;
         answerElem.classList.remove("disabled");
         answerElem.classList.remove("selected");
+        answerElem.blur();
     }
-
-    document.activeElement?.blur();
 
     startTimer(questionTime);
 }
@@ -335,7 +334,7 @@ function createJoinCodeForm(givenCode) {
 
     document.getElementById('actions').appendChild(joinButton);
 
-
+    joinButton.addEventListener('click', joinGame);
 
     const inputElements = [...document.querySelectorAll('#digit-group input')]
 
@@ -365,8 +364,6 @@ function createJoinCodeForm(givenCode) {
                 document.getElementById("join-btn").disabled = true;
                 document.getElementById("join-btn").classList.add('disabled');
             }
-
-            joinButton.addEventListener('click', joinGame);
         })
     })
 }
