@@ -34,7 +34,6 @@ leaderBoardDB.serialize(() => {
       if (err) {
         return console.error(err.message);
       }
-      console.log('Created table');
     });
     leaderBoardDB.run(`INSERT INTO LEADERBOARD(game_id, player_id, score) VALUES ('game1', 1, 1);`);
     leaderBoardDB.run(`INSERT INTO LEADERBOARD(game_id, player_id, score) VALUES ('game1', 2, 1);`);

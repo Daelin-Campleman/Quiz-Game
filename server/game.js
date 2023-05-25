@@ -11,7 +11,6 @@ function Player(ws, name, id, isHost) {
   this.isHost = isHost;
 }
 
-// Stores current games in memory
 const liveGames = new Map();
 
 /**
@@ -48,7 +47,7 @@ export async function createGame(startingPlayer, gameOptions) {
     liveGames.set(joinCode, game);
     startingPlayer.send(JSON.stringify({
       requestType: "JOIN",
-      "isHost": true,
+      isHost: true,
       joinCode: joinCode,
       message: `joined game with player id: ${user['id']}`
     }));
@@ -57,11 +56,8 @@ export async function createGame(startingPlayer, gameOptions) {
 
 /**
  * 
- * @param {String} clientID 
- * @param {String} gameID 
- * @param {String} answer 
- * 
- * *
+ * @param {Websocket} client 
+ * @param {Object} options 
  * Receives answer for player and stores in player object in game object in liveGames
  */
 export function clientAnswer(client, options) {
@@ -73,19 +69,16 @@ export function clientAnswer(client, options) {
     player.currentAnswer = answer;
   }
   client.send(JSON.stringify({
-    "message": "Answer received"
+    message: "Answer received"
   })); 
 }
 
 /**
  * 
  * @param {Websocket} socket 
- * @param {String} gameID 
- * 
- * *
+ * @param {Object} gameOptions 
  * Adds new player to game
  */
-
 export function joinGame(socket, gameOptions) {
   let joinCode = gameOptions['joinCode'];
   let user = gameOptions['player'];
@@ -124,7 +117,6 @@ export function joinGame(socket, gameOptions) {
         success: true, 
         message: `Successfully Joined Game with player id: ${user['id']}`, 
       }));
-      console.log(liveGames);
     }
   }
 }
@@ -132,10 +124,11 @@ export function joinGame(socket, gameOptions) {
 /**
  * 
  * @param {Object} question 
- * @param {string} gameID 
- * 
- * *
- * Sends a question to a all clients in game
+ * @param {String} joinCode 
+ * @param {Number} questionNumber 
+ * @param {Number} roundNumber 
+ * @param {Number} roundTime 
+ * Sends a question to all clients in game
  */
 function sendQuestions(question, joinCode, questionNumber, roundNumber, roundTime) {
   const game = liveGames.get(joinCode);
@@ -143,14 +136,14 @@ function sendQuestions(question, joinCode, questionNumber, roundNumber, roundTim
     const players = game.players;
     players.forEach(p => {
       p.ws.send(JSON.stringify({
-        "requestType": "QUESTION",
-        "questionText": question.question,
-        "questionOptions": shuffleArray([...question.incorrectAnswers, question.correctAnswer]),
-        "questionNumber": questionNumber,
-        "roundNumber": roundNumber,
-        "roundTime": roundTime,
-        "gameId": game.gameId,
-        "joinCode": game.joinCode
+        requestType: "QUESTION",
+        questionText: question.question,
+        questionOptions: shuffleArray([...question.incorrectAnswers, question.correctAnswer]),
+        questionNumber: questionNumber,
+        roundNumber: roundNumber,
+        roundTime: roundTime,
+        gameId: game.gameId,
+        joinCode: game.joinCode
       }));
     })
   }
@@ -171,7 +164,7 @@ function shuffleArray(array) {
 
 /**
  * 
- * @param {String} gameID
+ * @param {String} joinCode
  * 
  * *
  * Starts gameloop
@@ -193,7 +186,6 @@ export function startGame(joinCode) {
  */
 export function questionOver(joinCode) {
   const game = liveGames.get(joinCode);
-  console.log(`round: ${game.currentRound}, question: ${game.currentQuestion}`)
   const players = game.players;
   let correctAnswer = game.questions[calculateQuestionNumber(joinCode)].correctAnswer.trim().toUpperCase();
   game.currentQuestion++;
@@ -231,15 +223,20 @@ export function roundOver(joinCode) {
     const players = game.players;
     players.forEach(p => {
       p.ws.send(JSON.stringify({
-        "requestType": "ROUND OVER",
-        "isHost": p.isHost,
-        "joinCode": joinCode,
-        "gameId": game.gameId
+        requestType: "ROUND OVER",
+        isHost: p.isHost,
+        joinCode: joinCode,
+        gameId: game.gameId
       }));
     })
   }
 }
 
+/**
+ *
+ * @param {Number} joinCode 
+ *  Starts the next round for the associated game
+ */
 export function nextRound(joinCode) {
   const game = liveGames.get(joinCode);
     sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode, game.currentQuestion, game.currentRound, game.roundTime);
@@ -259,7 +256,6 @@ export function nextRound(joinCode) {
 function endGame(joinCode) {
   const game = liveGames.get(joinCode);
   clearInterval(game.intervalID);
-  console.log(`Game ended: ${joinCode}`)
   const players = game.players;
   const playerDetails = players.map((p) => {
     return {
@@ -269,10 +265,10 @@ function endGame(joinCode) {
   });
   players.forEach(p => {
     p.ws.send(JSON.stringify({
-      "requestType": "GAME OVER",
-      "score": p.score,
-      "playerDetails": playerDetails,
-      "gameId": game.gameId
+      requestType: "GAME OVER",
+      score: p.score,
+      playerDetails: playerDetails,
+      gameId: game.gameId
     }))
   });
   sendToDB(joinCode, game.gameId);
