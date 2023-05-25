@@ -29,7 +29,7 @@ authRouter.get('/css/style.css', function(req, res, next) {
 authRouter.get('/login/federated/google', passport.authenticate('google'));
 
 authRouter.get('/oauth2/redirect/google', passport.authenticate('google', {
-  successReturnToOrRedirect: '/home',
+  successReturnToOrRedirect: '/',
   failureRedirect: '/auth/login'
 }));
 

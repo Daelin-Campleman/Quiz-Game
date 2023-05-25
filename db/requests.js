@@ -20,6 +20,7 @@ export function getGameLeaderboardRequest(gameID) {
     INNER JOIN game_score s
     ON u.user_id = s.user_id
     WHERE s.game_id = ${gameID}
+    ORDER BY s.score DESC
     `
 
     return  execSQLRequest(sql);
@@ -51,10 +52,6 @@ export function getTableRequest() {
     let sql = `SELECT * FROM game_score`;
 
     return execSQLRequest(sql);
-}
-
-function buildRequest(query, callback) {
-    return new Request(query, callback);
 }
 
 export function selectFederatedCredentialsByIdRequest(provider, subject) {

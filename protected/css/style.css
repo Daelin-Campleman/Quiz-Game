@@ -199,6 +199,10 @@ section.grid {
     margin: 1em;
 }
 
+#join-code-header.error {
+    color: red;
+}
+
 .btn {
     text-decoration: none;
     position: relative;
@@ -539,7 +543,11 @@ footer {
 }
 
 #loader {
-    height: 100vh;
+    position: fixed;
+    top: 50vh;
+    left: 0;
+    height: 50vh;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -615,6 +623,11 @@ footer {
 
 /* @media for mobile */
 @media screen and (max-width: 768px) {
+    #logo-img {
+        width: 40%;
+        height: 20vh;
+    }
+
     #answers>button {
         width: 100%;
         min-height: 3em;
@@ -628,7 +641,7 @@ footer {
     }
 
     #digit-group input {
-        width: 14%;
+        width: 6vw;
         height: 70px;
         line-height: 70px;
         font-size: 42px;
