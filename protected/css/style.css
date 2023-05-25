@@ -669,4 +669,8 @@ footer {
     #game-options form label {
         margin-left: 25%;
     }
+
+    .btn.selected {
+        animation: none;
+    }
 }

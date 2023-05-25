@@ -120,9 +120,8 @@ function handleQuestion(msg) {
         answerElem.textContent = answer;
         answerElem.classList.remove("disabled");
         answerElem.classList.remove("selected");
+        answerElem.blur();
     }
-
-    document.activeElement?.blur();
 
     startTimer(questionTime);
 }
