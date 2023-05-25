@@ -30,6 +30,6 @@ export const userDBVerification = async (issuer, profile, cb) => {
         return cb(null, user);
     }
     catch (err) {
-        console.log("this right here: " + err);
+        console.log(err);
     }
 }

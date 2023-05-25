@@ -29,7 +29,7 @@ export function createRequestT(sql) {
   connection.connect();
 }
 
-export const execSQLRequest = (sql) =>  
+export const execSQLRequest = (sql, params) =>  
   new Promise((resolve, reject) => {
     const connection = new Connection(dbConfig);
 
@@ -44,6 +44,10 @@ export const execSQLRequest = (sql) =>
       }
       connection.close();
     });
+
+    params?.forEach(p => {
+      request.addParameter(p.name, p.type, p.value);
+    });;
 
     request.on('row', columns => {
 
