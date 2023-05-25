@@ -130,7 +130,7 @@ function handleQuestion(msg) {
 }
 
 function handleRoundOver(msg) {
-    let isHost = response['isHost'];
+    let isHost = msg['isHost'];
         
     if(isHost){
         document.getElementById("question").classList.add("hidden");
@@ -151,7 +151,7 @@ function handleRoundOver(msg) {
         startRound.classList.add("btn");
         document.getElementById('actions').appendChild(startRound);
         startRound.onclick = () => {
-            nextRound(response["joinCode"]);
+            nextRound(msg["joinCode"]);
         };
     } else {
         document.getElementById("question").classList.add("hidden");
@@ -168,7 +168,7 @@ function handleRoundOver(msg) {
 function handleGameOver(msg) {
     let playerDetails = msg['playerDetails'];
     localStorage.setItem("playerDetails", playerDetails);
-    window.location = "/home/leaderboard.html?gameId=" + msg['gameId'];
+    window.location = "/leaderboard?gameId=" + msg['gameId'];
 }
 
 async function showCreatorWaitingScreen(response){
@@ -216,6 +216,8 @@ function addPlayerToList(response){
         li.textContent = response['players'][i]['name'];
         document.getElementById('player-list').appendChild(li);
     }
+
+    console.log(response["players"]);
 }
 
 async function createGame() {
