@@ -53,6 +53,21 @@ export async function createGame(startingPlayer, gameOptions) {
       message: `joined game with player id: ${user['id']}`
     }));
   });
+
+  startingPlayer.on("close", hotPotato(joinCode));
+}
+
+const hotPotato = (joinCode) => {
+  return function() {
+    console.log(joinCode);
+    if (liveGames.get(joinCode).players.length == 1 || liveGames.get(joinCode).started == false)
+        endGame(joinCode);
+    else {
+      liveGames.get(joinCode).players.shift();
+      liveGames.get(joinCode).players[0].isHost = true;
+      liveGames.get(joinCode).players[0].on("close", hotPotato(joinCode));
+    }
+  }
 }
 
 /**
@@ -178,6 +193,7 @@ function shuffleArray(array) {
  */
 export function startGame(joinCode) {
   const game = liveGames.get(joinCode);
+  game.started = true;
   sendQuestions(game.questions[calculateQuestionNumber(joinCode)], joinCode, game.currentQuestion, game.currentRound, game.roundTime);
   game.intervalID = setInterval(() => {
     questionOver(joinCode);
@@ -222,6 +238,7 @@ export function questionOver(joinCode) {
  */
 export function roundOver(joinCode) {
   const game = liveGames.get(joinCode);
+  game.started = false;
   clearInterval(game.intervalID);
   game.currentQuestion = 1;
   game.currentRound += 1;

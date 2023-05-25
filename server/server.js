@@ -16,7 +16,7 @@ const server = http.createServer(app);
 
 process.on("uncaughtException", (error) => {
   DEBUG(`uncaught exception: ${error}`);
-  process.exit(1);
+  //process.exit(1);
 });
 
 process.on("unhandledRejection", (err) => {
@@ -25,7 +25,7 @@ process.on("unhandledRejection", (err) => {
     name: err.name,
     message: err.message || err,
   });
-  process.exit(1);
+  //process.exit(1);
 });
 
 server.listen(PORT, () => {
