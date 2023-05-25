@@ -1,14 +1,11 @@
-import { response } from "express";
 import { insertUserRequest, selectFederatedCredentialsByIdRequest, insertFederatedCredentialsRequest } from "../../db/requests.js";
 
 export const userDBVerification = async (issuer, profile, cb) => {
 
     try {
         let response = await selectFederatedCredentialsByIdRequest(issuer, profile.id);
-        console.log(response);
-        console.log(response.length);
 
-        var userId;
+        let userId = -1;
 
         if (response.length == 0) {
             response = await insertUserRequest(profile.displayName);
@@ -24,8 +21,6 @@ export const userDBVerification = async (issuer, profile, cb) => {
             id: userId,
             name: profile.displayName
         };
-
-        console.log(user);
 
         return cb(null, user);
     }

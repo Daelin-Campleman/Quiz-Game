@@ -1,5 +1,5 @@
 import { TYPES } from "tedious";
-import { execSQLRequest } from "./quizdb.js";
+import execSQLRequest from "./quizdb.js";
 
 export function createGameRequest(joinCode) {
 
@@ -44,14 +44,6 @@ export function getGameLeaderboardRequest(gameID) {
 
 export function saveGameLeaderBoardRequest(gameId, players) {
 
-    // let values = "";
-
-    // players.forEach(player => {
-    //     values += `(${gameId}, ${player.id}, ${player.score}),`;
-    // });
-
-    // values = values.substring(0, values.length - 1);
-
     let params = [{
         name: "gameId",
         type: TYPES.BigInt,
@@ -89,9 +81,6 @@ export function saveGameLeaderBoardRequest(gameId, players) {
         VALUES ${values};
     `;
 
-    console.log(sql);
-    console.log(params);
-
     return execSQLRequest(sql, params);
 }
 
@@ -120,6 +109,7 @@ export function selectFederatedCredentialsByIdRequest(provider, subject) {
 }
 
 export function insertUserRequest(name){
+
     const sql = `
         INSERT INTO [dbo].[user] (
             [username],
