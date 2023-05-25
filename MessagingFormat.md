@@ -1,5 +1,23 @@
 # Messaging Format Between Client and Server
 
+Overall Format - see detailed sections below for more detail
+```
+{
+    requestType: string,
+    isHost: bool,
+    newPlayer: bool,
+    message: string,
+    score: number,
+    playerDetails: string,
+    gameId: string,
+    joinCode: string,
+    questionText: string,
+    questionOptions: array<string>,
+    questionNumber: number,
+    roundNumber: number,
+    roundTime: number
+}
+```
 ## Message Types
 ### Client
 The client can send the following message types: `JOIN, CREATE, ANSWER, START`.
@@ -41,6 +59,14 @@ The client can send the following message types: `JOIN, CREATE, ANSWER, START`.
     - 
 - `START`
     - Starts the game
+    - Full JSON request
+        ```JSON
+        {
+            requestType: "START",
+            gameID: "GAME CODE"
+        }
+- `QUESTION`
+    - Message contains a
     - Full JSON request
         ```JSON
         {
