@@ -182,9 +182,9 @@ async function showCreatorWaitingScreen(response){
     let qrCode = document.createElement('img');
     let link = "";
     if(window.location.host.includes("-qa")){
-        link = `http://quizwizzyzilla-qa.azurewebsites.net/home/game?join=${joinCode}`;
+        link = `http://quizwizzyzilla-qa.azurewebsites.net/game?join=${joinCode}`;
     } else {
-        link = `http://quizwizzy.co.za/home/game?join=${joinCode}`;
+        link = `http://quizwizzy.co.za/game?join=${joinCode}`;
     }
     qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?data=${link}&size=200x200&bgcolor=ffffff&color=380036&margin=5`;
     document.getElementById('join-code').appendChild(joinCodeEl);
@@ -210,7 +210,7 @@ function addPlayerToList(response){
     liHeader.textContent = "Players";
     document.getElementById('player-list').appendChild(liHeader);
 
-    for (let i = 0; i < response['players'].length; i++) {
+    for (let i = 1; i < response['players'].length; i++) {
         // create li and append to ul
         let li = document.createElement('li');
         li.textContent = response['players'][i]['name'];
