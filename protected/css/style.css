@@ -203,7 +203,8 @@ section.grid {
     color: red;
 }
 
-.btn {
+.btn,
+.btn-logout {
     text-decoration: none;
     position: relative;
     border: none;
@@ -220,6 +221,11 @@ section.grid {
     border: none;
     z-index: 1;
     margin: 1em;
+}
+
+.btn-logout {
+    background: grey;
+    cursor: pointer;
 }
 
 .btn.disabled {
