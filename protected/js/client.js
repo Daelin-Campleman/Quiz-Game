@@ -313,14 +313,6 @@ function createJoinCodeForm(givenCode) {
         input.className = "singleInput";
         input.maxLength = 1;
 
-        if (i < 5) {
-            input.setAttribute('data-next', `digit-${i + 1}`);
-        }
-
-        if (i > 1) {
-            input.setAttribute('data-previous', `digit-${i - 1}`);
-        }
-
         if (givenCode != null && givenCode.length == 5) {
             input.value = givenCode.charAt(i - 1);
         }
