@@ -540,9 +540,9 @@ footer {
 
 #loader {
     position: fixed;
-    top: 0;
+    top: 50vh;
     left: 0;
-    height: 100vh;
+    height: 50vh;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -619,6 +619,11 @@ footer {
 
 /* @media for mobile */
 @media screen and (max-width: 768px) {
+    #logo-img {
+        width: 40%;
+        height: 20vh;
+    }
+
     #answers>button {
         width: 100%;
         min-height: 3em;
