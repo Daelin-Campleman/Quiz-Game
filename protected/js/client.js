@@ -448,4 +448,6 @@ function startTimer(time){
 function showGameOptions(){
     let place = document.getElementById("game-options");
     place.classList.remove("hidden");
+  
+    document.getElementById("join-code").classList.add("hidden");
 }

@@ -48,8 +48,8 @@ app.use(function(req, res, next) {
 passport.initialize();
 
 app.use('/auth', authRouter);
-app.use('/game', ensureLoggedIn('/auth/login'), gameRouter)
-app.use('/',express.static(__dirname + '/public'));
-app.use('/home', ensureLoggedIn('/auth/login'),express.static(__dirname + '/protected'))
+app.use('/game', ensureLoggedIn('/home'), gameRouter)
+app.use('/home',express.static(__dirname + '/public'));
+app.use('/', ensureLoggedIn('/home'),express.static(__dirname + '/protected'))
 
 export default app;
