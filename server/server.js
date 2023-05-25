@@ -5,8 +5,6 @@ import debug from "debug";
 import { config } from "dotenv";
 import app from "../app.js";
 
-
-// Fetching env variables
 config();
 
 const DEBUG = debug("dev");
@@ -45,7 +43,6 @@ const wss = new WebSocketServer({ server: server });
  * See MessagingFormat.md for a breakdown of messaging types
  */
 function parseMessage(msg, ws) {
-  console.log(`Received Message: ${JSON.stringify(msg)}`);
   switch(msg['requestType']) {
     case "CREATE":
       createGame(ws, msg);

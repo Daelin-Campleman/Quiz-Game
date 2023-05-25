@@ -48,16 +48,12 @@ socket.onopen = () => {
                     btn2.classList.add("selected");
                 }
             });
-
-            console.log(event.currentTarget.textContent);
             sendAnswer(event.currentTarget.textContent);
         });
     }
 }
 
 socket.onmessage = async (event) => {
-    console.log(event);
-    console.log(`Message received: ${event.data}`)
     let response = JSON.parse(event.data);
 
     switch (response['requestType']) {
@@ -85,7 +81,6 @@ function handleJoin(msg) {
             addPlayerToList(msg);
         }
     } else {
-        console.log('other player')
         if (msg['success']) {
             showWaitingScreen();
         } else {
@@ -126,6 +121,8 @@ function handleQuestion(msg) {
         answerElem.classList.remove("disabled");
         answerElem.classList.remove("selected");
     }
+
+    document.activeElement?.blur();
 
     startTimer(questionTime);
 }
@@ -217,8 +214,6 @@ function addPlayerToList(response) {
         li.textContent = response['players'][i]['name'];
         document.getElementById('player-list').appendChild(li);
     }
-
-    console.log(response["players"]);
 }
 
 async function createGame() {
@@ -253,7 +248,6 @@ async function createGame() {
 }
 
 function nextRound(joinCode) {
-    console.log('Sending next round')
     socket.send(JSON.stringify({
         requestType: "NEXT ROUND",
         joinCode: joinCode,
@@ -269,7 +263,6 @@ function showWaitingScreen() {
 }
 
 function startGame() {
-    console.log(`joinCode: ${joinCode}`)
     socket.send(
         JSON.stringify({
             requestType: "START",

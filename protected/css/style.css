@@ -623,7 +623,7 @@ footer {
 
 /* @media for mobile */
 @media screen and (max-width: 768px) {
-    #logo-img {
+    header img {
         width: 40%;
         height: 20vh;
     }
