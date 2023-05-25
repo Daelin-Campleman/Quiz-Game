@@ -96,11 +96,11 @@ function handleJoin(msg) {
 
 function handleQuestion(msg) {
     document.getElementById("join-code-header").textContent = "";
-    let question = response['questionText']['text'];
-    let answers = response['questionOptions'];
-    let questionNumber = response['questionNumber'];
-    let roundNumber = response['roundNumber'];
-    let questionTime = response['roundTime'];
+    let question = msg['questionText']['text'];
+    let answers = msg['questionOptions'];
+    let questionNumber = msg['questionNumber'];
+    let roundNumber = msg['roundNumber'];
+    let questionTime = msg['roundTime'];
 
     document.getElementById("question").classList.remove("hidden");
     document.getElementById("answers").classList.remove("hidden");
