@@ -56,15 +56,15 @@ export async function createGame(startingPlayer, gameOptions) {
   startingPlayer.on("close", hotPotato(joinCode));
 }
 
-const hotPotato = (joinCode) => {
+function hotPotato(joinCode) {
   return function() {
-    console.log(joinCode);
-    if (liveGames.get(joinCode).players.length == 1 || liveGames.get(joinCode).started == false)
-        endGame(joinCode);
+    if (liveGames.get(joinCode).players.length == 1 || liveGames.get(joinCode).started == false) {
+      endGame(joinCode);
+    }
     else {
       liveGames.get(joinCode).players.shift();
       liveGames.get(joinCode).players[0].isHost = true;
-      liveGames.get(joinCode).players[0].on("close", hotPotato(joinCode));
+      liveGames.get(joinCode).players[0].ws.on("close", hotPotato(joinCode));
     }
   }
 }
